@@ -1,0 +1,80 @@
+{
+  "name": "n8n-nodes-demeterics",
+  "version": "0.1.0",
+  "description": "n8n community node for Demeterics LLM Gateway - Access multiple AI providers (Groq, OpenAI, Anthropic, Google Gemini) through a unified API with built-in observability and cost tracking.",
+  "keywords": [
+    "n8n-community-node-package",
+    "n8n",
+    "demeterics",
+    "llm",
+    "llm-observability",
+    "ai",
+    "openai",
+    "anthropic",
+    "groq",
+    "gemini",
+    "google",
+    "langchain",
+    "chat-model",
+    "ai-gateway",
+    "llm-gateway"
+  ],
+  "license": "MIT",
+  "homepage": "https://demeterics.com",
+  "author": {
+    "name": "Demeterics",
+    "email": "support@demeterics.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bluefermion/n8n-nodes-demeterics.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bluefermion/n8n-nodes-demeterics/issues"
+  },
+  "engines": {
+    "node": ">=18.0",
+    "pnpm": ">=9.0"
+  },
+  "packageManager": "pnpm@9.1.4",
+  "main": "dist/nodes/DemetericsChat/DemetericsChat.node.js",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "build": "tsc && gulp build:icons",
+    "dev": "tsc --watch",
+    "format": "prettier nodes credentials --write",
+    "lint": "eslint nodes credentials package.json",
+    "lintfix": "eslint nodes credentials package.json --fix",
+    "check": "npx @n8n/scan-community-package .",
+    "prepublishOnly": "pnpm build && pnpm lint",
+    "release": "pnpm run build && pnpm publish --access public"
+  },
+  "files": [
+    "dist"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/credentials/DemetericsApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/DemetericsChat/DemetericsChat.node.js"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "eslint-plugin-n8n-nodes-base": "^1.16.0",
+    "gulp": "^5.0.0",
+    "n8n-workflow": "*",
+    "prettier": "^3.0.0",
+    "typescript": "^5.5.0"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  },
+  "dependencies": {
+    "@langchain/openai": "^0.3.0"
+  }
+}
