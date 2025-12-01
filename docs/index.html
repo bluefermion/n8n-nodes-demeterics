@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>n8n-nodes-demeterics | Demeterics LLM Gateway for n8n</title>
+    <meta name="description" content="n8n community node for Demeterics LLM Gateway - Access Groq, OpenAI, Anthropic, and Google Gemini through a unified API with built-in observability and cost tracking.">
+    <meta name="keywords" content="n8n, demeterics, llm, ai, openai, anthropic, groq, gemini, langchain, workflow automation, llm observability">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="n8n-nodes-demeterics | Demeterics LLM Gateway">
+    <meta property="og:description" content="Access multiple AI providers through a unified API with built-in observability and cost tracking in your n8n workflows.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://bluefermion.github.io/n8n-nodes-demeterics/">
+
+    <!-- Favicon -->
+    <link rel="icon" href="https://demeterics.ai/static/img/favicon.ico" type="image/x-icon">
+
+    <style>
+        :root {
+            --primary: #1da7a0;
+            --primary-dark: #12303b;
+            --text: #333;
+            --text-muted: #666;
+            --bg: #ffffff;
+            --bg-alt: #f8f9fa;
+            --border: #e9ecef;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--bg);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Hero with Video */
+        .hero {
+            position: relative;
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .hero-video-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .hero-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: 50% 25%;
+            opacity: 0.7;
+        }
+
+        .hero-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: 50% 25%;
+            opacity: 0.7;
+            display: none;
+        }
+
+        .hero-image.visible {
+            display: block;
+        }
+
+        .hero-video.hidden {
+            display: none;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.6) 100%);
+            z-index: 2;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 3;
+            text-align: center;
+            color: white;
+            padding: 40px 20px;
+        }
+
+        .hero h1 {
+            font-size: 2.75rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            text-shadow: 0 1px 10px rgba(0,0,0,0.5);
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(4px);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 14px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: white;
+            color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.4);
+            backdrop-filter: blur(4px);
+        }
+
+        /* Features */
+        .features {
+            padding: 70px 20px;
+            background: var(--bg-alt);
+        }
+
+        .features h2 {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            color: var(--primary-dark);
+            font-size: 2rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 1.75rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .feature-card h3 {
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            font-size: 1.15rem;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Installation */
+        .installation {
+            padding: 70px 20px;
+        }
+
+        .installation h2 {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            color: var(--primary-dark);
+            font-size: 2rem;
+        }
+
+        .install-steps {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .step {
+            display: flex;
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            margin-bottom: 0.25rem;
+            font-size: 1.1rem;
+        }
+
+        .step-content p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        code {
+            background: var(--bg-alt);
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.9rem;
+            color: var(--primary-dark);
+        }
+
+        /* Providers */
+        .providers {
+            padding: 70px 20px;
+            background: var(--bg-alt);
+        }
+
+        .providers h2 {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            color: var(--primary-dark);
+            font-size: 2rem;
+        }
+
+        .provider-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.25rem;
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        .provider-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+        }
+
+        .provider-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .provider-card h4 {
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .provider-card p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary-dark);
+            color: white;
+            padding: 50px 20px;
+            text-align: center;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2.5rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: rgba(255,255,255,0.85);
+            font-weight: 500;
+        }
+
+        .copyright {
+            opacity: 0.6;
+            font-size: 0.875rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .hero {
+                min-height: 50vh;
+            }
+
+            .hero h1 {
+                font-size: 1.85rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 280px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero with Video Background -->
+    <section class="hero">
+        <!-- Video Background Container -->
+        <div class="hero-video-container">
+            <video id="heroVideo"
+                   class="hero-video"
+                   autoplay
+                   muted
+                   playsinline
+                   poster="https://demeterics.com/static/img/video_end.png">
+                <source src="https://demeterics.com/static/img/video.mp4" type="video/mp4">
+            </video>
+            <img id="heroImage"
+                 src="https://demeterics.com/static/img/video_end.png"
+                 alt="Demeterics"
+                 class="hero-image">
+        </div>
+
+        <!-- Gradient Overlay -->
+        <div class="hero-overlay"></div>
+
+        <!-- Hero Content -->
+        <div class="hero-content">
+            <div class="badge">n8n Community Node</div>
+            <h1>n8n-nodes-demeterics</h1>
+            <p>Access multiple AI providers through a unified API with built-in observability and cost tracking in your n8n workflows.</p>
+            <div class="buttons">
+                <a href="https://github.com/bluefermion/n8n-nodes-demeterics" class="btn btn-primary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    View on GitHub
+                </a>
+                <a href="https://demeterics.ai/docs/n8n" class="btn btn-secondary">
+                    Documentation
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Video End Handler Script -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const video = document.getElementById('heroVideo');
+        const image = document.getElementById('heroImage');
+
+        if (video && image) {
+            video.addEventListener('ended', function() {
+                video.classList.add('hidden');
+                image.classList.add('visible');
+            });
+
+            video.addEventListener('error', function() {
+                video.classList.add('hidden');
+                image.classList.add('visible');
+            });
+        }
+    });
+    </script>
+
+    <!-- Features -->
+    <section class="features">
+        <div class="container">
+            <h2>Why Use Demeterics?</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Multi-Provider Access</h3>
+                    <p>Switch between Groq, OpenAI, Anthropic, and Google Gemini with a single credential. No vendor lock-in.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Cost Tracking</h3>
+                    <p>See exactly what each workflow costs in real-time. Monitor spend across all AI providers in one dashboard.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Full Observability</h3>
+                    <p>Log every prompt, response, and token for debugging and compliance. Understand usage patterns.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>LangChain Compatible</h3>
+                    <p>Works seamlessly with n8n's AI Agent, LLM Chain, Summarization Chain, and Q&A nodes.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Installation -->
+    <section class="installation">
+        <div class="container">
+            <h2>Quick Install</h2>
+            <div class="install-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Open Community Nodes</h4>
+                        <p>Go to <strong>Settings &gt; Community Nodes</strong> in your n8n instance</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Install the Package</h4>
+                        <p>Click <strong>Install</strong> and enter <code>n8n-nodes-demeterics</code></p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Add Your API Key</h4>
+                        <p>Get your API key from <a href="https://demeterics.ai">demeterics.ai</a> and add it to credentials</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Providers -->
+    <section class="providers">
+        <div class="container">
+            <h2>Supported Providers</h2>
+            <div class="provider-grid">
+                <div class="provider-card">
+                    <h4>Groq</h4>
+                    <p>Llama 3.3/4, Compound AI, Qwen3, Kimi K2, GPT-OSS</p>
+                </div>
+                <div class="provider-card">
+                    <h4>OpenAI</h4>
+                    <p>GPT-5, GPT-4.1, GPT-4o series</p>
+                </div>
+                <div class="provider-card">
+                    <h4>Anthropic</h4>
+                    <p>Claude Opus 4.5, Sonnet 4.5, Haiku 4.5</p>
+                </div>
+                <div class="provider-card">
+                    <h4>Google</h4>
+                    <p>Gemini 3 Pro, 2.5 Pro/Flash, 2.0, 1.5</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="https://github.com/bluefermion/n8n-nodes-demeterics">GitHub</a>
+                <a href="https://www.npmjs.com/package/n8n-nodes-demeterics">npm</a>
+                <a href="https://demeterics.ai/docs/n8n">Documentation</a>
+                <a href="https://demeterics.ai">Demeterics Platform</a>
+            </div>
+            <p class="copyright">
+                Built by <a href="https://demeterics.ai">Demeterics</a> - LLM Observability & Cost Tracking
+            </p>
+        </div>
+    </footer>
+
+    <!-- Demeterics AI Chat Widget -->
+    <script src="https://demeterics.com/widget/embed.js?k=DEM-M37CGCZZY7V3" async></script>
+    <dem-agent title="Help me get you started" state="minimized"></dem-agent>
+</body>
+</html>
