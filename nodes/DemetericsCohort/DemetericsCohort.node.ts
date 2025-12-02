@@ -5,7 +5,8 @@ import type {
   INodeTypeDescription,
 } from 'n8n-workflow';
 
-export class DemetericsConversion implements INodeType {
+// Note: class name must match file base name for n8n custom loader
+export class DemetericsCohort implements INodeType {
   description: INodeTypeDescription = {
     displayName: 'Demeterics Conversion',
     name: 'demetericsConversion',
