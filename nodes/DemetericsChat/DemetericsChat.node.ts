@@ -7,7 +7,7 @@ import type {
 	INodeProperties,
 	INodePropertyOptions,
 } from 'n8n-workflow';
-import { NodeConnectionType } from 'n8n-workflow';
+import { NodeConnectionTypes } from 'n8n-workflow';
 
 /**
  * Provider configurations with their supported models.
@@ -93,6 +93,17 @@ const PROVIDERS: Record<string, { name: string; models: INodePropertyOptions[] }
 			{ name: 'Gemini 1.5 Flash', value: 'gemini-1.5-flash' },
 		],
 	},
+	openrouter: {
+		name: 'OpenRouter',
+		models: [
+			{ name: 'OpenRouter Auto', value: 'openrouter/auto' },
+			{ name: 'Claude 3.5 Sonnet', value: 'anthropic/claude-3.5-sonnet' },
+			{ name: 'Gemini 1.5 Pro', value: 'google/gemini-1.5-pro' },
+			{ name: 'Llama 3.1 70B Instruct', value: 'meta-llama/llama-3.1-70b-instruct' },
+			{ name: 'Qwen 2.5 72B Instruct', value: 'qwen/qwen-2.5-72b-instruct' },
+			{ name: 'Mixtral 8x7B Instruct', value: 'mistralai/mixtral-8x7b-instruct' },
+		],
+	},
 };
 
 // Generate provider options for dropdown
@@ -120,7 +131,7 @@ export class DemetericsChat implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Demeterics Chat Model',
 		name: 'demetericsChat',
-		icon: 'file:demeterics.svg',
+		icon: 'file:demeterics-node.svg',
 		group: ['transform'],
 		version: 1,
 		description: 'Access multiple AI providers through Demeterics unified API with built-in tracking',
@@ -142,7 +153,7 @@ export class DemetericsChat implements INodeType {
 		},
 		// This node supplies data to other nodes (AI Agent, LLM Chain, etc.)
 		inputs: [],
-		outputs: [NodeConnectionType.AiLanguageModel],
+		outputs: [NodeConnectionTypes.AiLanguageModel],
 		outputNames: ['Model'],
 		credentials: [
 			{
@@ -248,11 +259,10 @@ export class DemetericsChat implements INodeType {
 	async supplyData(this: ISupplyDataFunctions): Promise<SupplyData> {
 		// Get credentials
 		const credentials = await this.getCredentials('demetericsApi');
-		// Combine prefix and secret parts into full API key
-		const apiKeyPrefix = credentials.apiKeyPrefix as string;
-		const apiKeySecret = credentials.apiKeySecret as string;
-		const apiKey = `${apiKeyPrefix}_${apiKeySecret}`;
-		const baseUrl = (credentials.baseUrl as string) || 'https://api.demeterics.com';
+    // Managed vs BYOK handling. Primary key is a single Demeterics key.
+    const demetericsKey = (credentials.apiKey as string) || '';
+    const byok = Boolean(credentials.byok);
+    const baseUrl = (credentials.baseUrl as string) || 'https://api.demeterics.com';
 
 		// Get node parameters
 		const provider = this.getNodeParameter('provider', 0) as string;
@@ -266,15 +276,37 @@ export class DemetericsChat implements INodeType {
 			timeout?: number;
 		};
 
-		// Build the full model identifier for Demeterics API
-		// Format: provider/model (e.g., "openai/gpt-4.1", "anthropic/claude-sonnet-4")
-		const fullModelId = `${provider}/${model}`;
+		// Use provider-specific base path and pass raw model id
+		// Example: basePath `${baseUrl}/groq/v1` and model `llama-3.1-8b-instant`
+		const providerBaseMap: Record<string, string> = {
+			groq: 'groq',
+			openai: 'openai',
+			anthropic: 'anthropic',
+			google: 'google', // Gemini via OpenAI-compatible proxy
+			openrouter: 'openrouter',
+		};
+    const providerBase = providerBaseMap[provider] ?? 'openai';
+    const modelId = model;
+
+    // Determine provider-specific BYOK vendor key from credentials
+    const providerToCredentialKey: Record<string, string> = {
+      groq: 'providerApiKeyGroq',
+      openai: 'providerApiKeyOpenAI',
+      anthropic: 'providerApiKeyAnthropic',
+      google: 'providerApiKeyGemini',
+      openrouter: 'providerApiKeyOpenRouter',
+    };
+    const vendorKeyField = providerToCredentialKey[provider];
+    const vendorKey = vendorKeyField ? ((credentials as any)[vendorKeyField] as string) || '' : '';
+
+    // Compose final Authorization token for LangChain client
+    const apiKey = byok && vendorKey ? `${demetericsKey};${vendorKey}` : demetericsKey;
 
 		// Create ChatOpenAI instance pointing to Demeterics API
 		// Demeterics provides an OpenAI-compatible endpoint for all providers
 		const chatModel = new ChatOpenAI({
-			openAIApiKey: apiKey,
-			modelName: fullModelId,
+			apiKey: apiKey,
+			model: modelId,
 			temperature: options.temperature ?? 0.7,
 			maxTokens: options.maxTokens ?? 4096,
 			topP: options.topP ?? 1,
@@ -282,7 +314,7 @@ export class DemetericsChat implements INodeType {
 			presencePenalty: options.presencePenalty ?? 0,
 			timeout: (options.timeout ?? 60) * 1000,
 			configuration: {
-				baseURL: `${baseUrl}/api/openai/v1`,
+				basePath: `${baseUrl.replace(/\/$/, '')}/${providerBase}/v1`,
 			},
 		});
 

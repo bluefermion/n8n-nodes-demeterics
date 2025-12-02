@@ -1,8 +1,9 @@
 const { src, dest } = require('gulp');
 
-// Copy SVG icons to dist folder
+// Copy icon assets (SVG/PNG) to dist for nodes and credentials
 function buildIcons() {
-	return src('nodes/**/*.svg').pipe(dest('dist/nodes'));
+    src('nodes/**/*.{svg,png}').pipe(dest('dist/nodes'));
+    return src('credentials/**/*.{svg,png}').pipe(dest('dist/credentials'));
 }
 
 exports['build:icons'] = buildIcons;

@@ -19,29 +19,87 @@ export class DemetericsApi implements ICredentialType {
 
 	displayName = 'Demeterics API';
 
+	// Use 32px PNG for best clarity at 18px UI scale
+	icon = 'file:demeterics-32.png' as const;
+
 	documentationUrl = 'https://demeterics.com/docs/api';
 
 	properties: INodeProperties[] = [
 		{
-			displayName: 'API Key Prefix',
-			name: 'apiKeyPrefix',
-			type: 'string',
-			default: '',
-			required: true,
-			placeholder: 'dmt_XXXXXXXX',
-			description: 'The first part of your Demeterics API key (visible prefix)',
+			displayName: 'BYOK (Bring Your Own Key)',
+			name: 'byok',
+			type: 'boolean',
+			default: false,
+			description:
+				'Enable if you use your own provider keys with Demeterics. Leave off for Managed Key.',
 		},
 		{
-			displayName: 'API Key Secret',
-			name: 'apiKeySecret',
+			displayName: 'Demeterics API Key',
+			name: 'apiKey',
 			type: 'string',
 			typeOptions: {
 				password: true,
 			},
 			default: '',
 			required: true,
-			placeholder: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-			description: 'The secret part of your Demeterics API key',
+			placeholder: 'dmt_xxx... (single key)',
+			description: 'Your Demeterics API key. For Managed Key, this is the only key needed.',
+		},
+		// BYOK per‑provider keys (optional). Only shown when BYOK is enabled.
+		{
+			displayName: 'Groq API Key',
+			name: 'providerApiKeyGroq',
+			type: 'string',
+			typeOptions: { password: true },
+			default: '',
+			required: false,
+			placeholder: 'GROQ_API_KEY',
+			description: 'Used when routing via Groq provider.',
+			displayOptions: { show: { byok: [true] } },
+		},
+		{
+			displayName: 'OpenAI API Key',
+			name: 'providerApiKeyOpenAI',
+			type: 'string',
+			typeOptions: { password: true },
+			default: '',
+			required: false,
+			placeholder: 'OPENAI_API_KEY',
+			description: 'Used when routing via OpenAI provider.',
+			displayOptions: { show: { byok: [true] } },
+		},
+		{
+			displayName: 'Anthropic API Key',
+			name: 'providerApiKeyAnthropic',
+			type: 'string',
+			typeOptions: { password: true },
+			default: '',
+			required: false,
+			placeholder: 'ANTHROPIC_API_KEY',
+			description: 'Used when routing via Anthropic provider.',
+			displayOptions: { show: { byok: [true] } },
+		},
+		{
+			displayName: 'Gemini API Key',
+			name: 'providerApiKeyGemini',
+			type: 'string',
+			typeOptions: { password: true },
+			default: '',
+			required: false,
+			placeholder: 'GEMINI_API_KEY',
+			description: 'Used when routing via Google Gemini provider.',
+			displayOptions: { show: { byok: [true] } },
+		},
+		{
+			displayName: 'OpenRouter API Key',
+			name: 'providerApiKeyOpenRouter',
+			type: 'string',
+			typeOptions: { password: true },
+			default: '',
+			required: false,
+			placeholder: 'OPENROUTER_API_KEY',
+			description: 'Used when routing via OpenRouter provider.',
+			displayOptions: { show: { byok: [true] } },
 		},
 		{
 			displayName: 'API Base URL',
@@ -56,7 +114,8 @@ export class DemetericsApi implements ICredentialType {
 		type: 'generic',
 		properties: {
 			headers: {
-				Authorization: '=Bearer {{$credentials.apiKeyPrefix}}_{{$credentials.apiKeySecret}}',
+				// Use the base Demeterics key for auth check; runtime can add vendor key if needed
+				Authorization: '=Bearer {{$credentials.apiKey}}',
 			},
 		},
 	};

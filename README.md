@@ -234,7 +234,10 @@ If the node doesn't appear, try:
 1. Go to **Credentials** in n8n
 2. Click **Add Credential**
 3. Search for "Demeterics API"
-4. Enter your API key prefix and secret
+4. Enter your single Demeterics API key (e.g., `dmt_xxx...`)
+5. Optional (BYOK): Toggle BYOK and add the provider key(s) you plan to use:
+   - Groq, OpenAI, Anthropic, Gemini, OpenRouter
+   The Chat node will automatically combine keys depending on the selected provider.
 
 ### 3. Use in Your Workflow
 
@@ -253,6 +256,7 @@ The **Demeterics Chat Model** node works with:
 | **OpenAI** | GPT-5/Mini/Nano/Codex, GPT-4.1/Mini/Nano, GPT-4o/Mini |
 | **Anthropic** | Claude Opus 4.5/4.1, Claude Sonnet 4.5/4/3.7, Claude Haiku 4.5/3.5 |
 | **Google** | Gemini 3 Pro, Gemini 2.5 Pro/Flash, Gemini 2.0 Flash, Gemini 1.5 Pro/Flash |
+| **OpenRouter** | openrouter/auto, plus curated Anthropic/Google/Meta/Qwen/Mistral routes |
 
 See the [full model list](https://demeterics.ai/docs/api-reference) for all supported models and pricing.
 
@@ -267,7 +271,7 @@ See the [full model list](https://demeterics.ai/docs/api-reference) for all supp
 | Presence Penalty | Encourage new topics (-2 to 2) | 0 |
 | Timeout | Request timeout in seconds | 60 |
 
-## Example Workflow
+## Example Workflows
 
 ```
 [Chat Trigger] → [AI Agent] ← [Demeterics Chat Model]
@@ -280,6 +284,24 @@ See the [full model list](https://demeterics.ai/docs/api-reference) for all supp
 3. Connect **Demeterics Chat Model** to the AI Agent's "Chat Model" input
 4. Select your provider and model
 5. Add tools as needed (Calculator, Code, HTTP Request, etc.)
+
+### Submit and Retrieve Cohort Outcomes
+
+```
+[Any Flow] → [Demeterics Cohort]
+```
+
+- Operation: Submit Outcome or Get Outcome
+- Fields: `cohortId` (required), optional `outcome`, `outcomeV2`, `label`, `eventDate`
+
+### Export Interaction Data
+
+```
+[Any Flow] → [Demeterics Extract]
+```
+
+- Operation: Export Interactions (Simple), Create Export Job, or Stream Export by Request ID
+- Formats: JSON (parsed items), CSV/Avro (binary file)
 
 ## Resources
 
@@ -312,6 +334,28 @@ pnpm lint
 # Run n8n package scanner
 pnpm check
 ```
+
+## Pack
+- Install CLI (optional): `make cli-install`
+- Build: `make build`
+- Prepare for submission (recommended): `make prepare`
+- Scan only: `make check`
+- Pack tarball: `make pack`
+
+- Bump version:
+    - Patch: npm version patch --no-git-tag-version
+    - Or set manually in package.json under version.
+- Build + sanity check:
+    - make build (uses n8n-node if present, falls back to tsc+gulp)
+    - Optional: npm pack to inspect the tarball contents
+- Publish:
+    - Using pnpm script: pnpm run release
+    - This runs `pnpm build` and `pnpm publish --access public`.
+- Or directly with npm: npm publish --access public
+    - If prompted, enter your OTP (2FA).
+- Verify on npm:
+    - npm view n8n-nodes-demeterics version shows the new version.
+
 
 ## Support
 

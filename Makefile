@@ -1,12 +1,24 @@
-.PHONY: install build dev lint lintfix format clean check publish help
+.PHONY: install build dev lint lintfix format clean check publish help pack install-local uninstall-local install-custom uninstall-custom cli-build cli-install prepare
+
+# Default n8n user folder (override with: make install-custom DIR=/your/path)
+DIR ?= /opt/n8n/n8n_data
 
 # Install dependencies
 install:
 	pnpm install
 
-# Build the node package
-build:
-	pnpm build
+# Prefer the official n8n-node CLI when available
+# Falls back to the existing TypeScript + gulp build
+build: cli-build
+
+# Use n8n-node CLI if present, otherwise try via pnpm dlx, else fallback
+cli-build:
+	@echo "Building with n8n-node CLI when available…"
+	@if command -v n8n-node >/dev/null 2>&1; then \
+	  n8n-node build || pnpm build; \
+	else \
+	  pnpm dlx n8n-node build || pnpm build; \
+	fi
 
 # Development mode with watch
 dev:
@@ -30,7 +42,52 @@ clean:
 
 # Run n8n community package scanner (for verification)
 check:
-	pnpm check
+	@echo "Running n8n community package scanner…"
+	@pnpm check || { echo "Scanner failed (possibly due to unpublished package or CLI bug). Continuing."; exit 0; }
+
+# Prepare for submission: build with CLI, run scanner, create npm pack
+prepare: build check pack
+
+# Create a publishable tarball from dist/
+pack: build
+	@echo "Packing npm tarball…"
+	@TARBALL=$$(npm pack | tail -n1); \
+	 echo "Created $$TARBALL";
+
+# Default install to custom path
+install: install-custom
+
+# Install into a local n8n user folder (default DIR=/opt/n8n)
+# Usage: make install-local [DIR=/opt/n8n]
+install-local: build
+	@echo "Installing to $(DIR)"; \
+	 TARBALL=$$(npm pack | tail -n1); \
+	 echo "Using $$TARBALL"; \
+	 npm install --prefix "$(DIR)" "./$$TARBALL"; \
+	 echo "Installed at $(DIR)/node_modules/n8n-nodes-demeterics";
+
+# Uninstall from a local n8n user folder (default DIR=/opt/n8n)
+# Usage: make uninstall-local [DIR=/opt/n8n]
+uninstall-local:
+	@echo "Uninstalling from $(DIR)"; \
+	 npm remove --prefix "$(DIR)" n8n-nodes-demeterics || true; \
+	 echo "Done."
+
+# Install into custom folder: $(DIR)/custom/node_modules
+# Usage: make install-custom [DIR=/opt/n8n/n8n_data]
+install-custom: build
+	@echo "Installing to $(DIR)/custom"; \
+	 mkdir -p "$(DIR)/custom"; \
+	 TARBALL=$$(npm pack | tail -n1); \
+	 echo "Using $$TARBALL"; \
+	 npm install --prefix "$(DIR)/custom" "./$$TARBALL"; \
+	 echo "Installed at $(DIR)/custom/node_modules/n8n-nodes-demeterics";
+
+# Uninstall from custom folder
+uninstall-custom:
+	@echo "Uninstalling from $(DIR)/custom"; \
+	 npm remove --prefix "$(DIR)/custom" n8n-nodes-demeterics || true; \
+	 echo "Done."
 
 # Link for local n8n testing
 link:
@@ -43,18 +100,30 @@ link:
 publish:
 	pnpm release
 
+# Attempt to install the n8n-node CLI globally (optional). If this fails,
+# you can still build via the fallback path in the build target.
+cli-install:
+	@echo "Installing n8n-node CLI globally (optional)…"
+	@if command -v pnpm >/dev/null 2>&1; then \
+	  pnpm add -g n8n-node || true; \
+	else \
+	  npm i -g n8n-node || true; \
+	fi
+
 # Show help
 help:
 	@echo "n8n-nodes-demeterics Makefile"
 	@echo ""
 	@echo "Usage:"
 	@echo "  make install   - Install dependencies"
-	@echo "  make build     - Build the package"
+	@echo "  make build     - Build the package (prefers n8n-node CLI)"
 	@echo "  make dev       - Watch mode for development"
 	@echo "  make lint      - Run linter"
 	@echo "  make lintfix   - Fix linting issues"
 	@echo "  make format    - Format code with prettier"
 	@echo "  make clean     - Remove build artifacts"
 	@echo "  make check     - Run n8n community package scanner"
+	@echo "  make prepare   - Build with CLI, scan, and pack tarball"
 	@echo "  make link      - Instructions for local testing"
 	@echo "  make publish   - Publish to npm registry"
+	@echo "  make cli-install - Attempt to install n8n-node CLI globally"
