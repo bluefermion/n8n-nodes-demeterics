@@ -5,16 +5,16 @@ import type {
   INodeTypeDescription,
 } from 'n8n-workflow';
 
-export class DemetericsCohort implements INodeType {
+export class DemetericsConversion implements INodeType {
   description: INodeTypeDescription = {
-    displayName: 'Demeterics Cohort',
-    name: 'demetericsCohort',
+    displayName: 'Demeterics Conversion',
+    name: 'demetericsConversion',
     icon: 'file:demeterics-node.svg',
     group: ['transform'],
     version: 1,
-    description: 'Submit and retrieve cohort outcomes (conversion metrics)',
+    description: 'Submit and retrieve conversion outcomes linked to a cohort_id',
     defaults: {
-      name: 'Demeterics Cohort',
+      name: 'Demeterics Conversion',
     },
     codex: {
       categories: ['AI'],

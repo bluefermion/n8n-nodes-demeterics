@@ -285,10 +285,10 @@ See the [full model list](https://demeterics.ai/docs/api-reference) for all supp
 4. Select your provider and model
 5. Add tools as needed (Calculator, Code, HTTP Request, etc.)
 
-### Submit and Retrieve Cohort Outcomes
+### Submit and Retrieve Conversion Outcomes
 
 ```
-[Any Flow] → [Demeterics Cohort]
+[Any Flow] → [Demeterics Conversion]
 ```
 
 - Operation: Submit Outcome or Get Outcome
