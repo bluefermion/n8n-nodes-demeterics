@@ -1,4 +1,4 @@
-.PHONY: install build dev lint lintfix format clean check publish help pack install-local uninstall-local install-custom uninstall-custom cli-build cli-install prepare verify version package
+.PHONY: install build dev lint lintfix format clean check publish help pack install-local uninstall-local install-custom uninstall-custom cli-build cli-install prepare verify version bump package wait-publish
 
 # Default n8n user folder (override with: make install-custom DIR=/your/path)
 DIR ?= /opt/n8n/n8n_data
@@ -118,10 +118,24 @@ publish:
 verify:
 	pnpm test
 
-# Bump version without creating a git tag.
-# Usage: make version [BUMP=patch|minor|major]
-BUMP ?= patch
+# Show local and npm registry versions
 version:
+	@set -e; \
+	PKG=$$(node -p "require('./package.json').name"); \
+	LOCAL=$$(node -p "require('./package.json').version"); \
+	echo "Package: $$PKG"; \
+	echo "Local version: $$LOCAL"; \
+	NPM_VER=$$(npm view $$PKG version 2>/dev/null || echo "(not published) "); \
+	TAGS=$$(npm view $$PKG dist-tags --json 2>/dev/null || echo "{}"); \
+	VERS=$$(npm view $$PKG versions --json 2>/dev/null || echo "[]"); \
+	echo "NPM latest: $$NPM_VER"; \
+	echo "NPM dist-tags: $$TAGS"; \
+	echo "NPM versions: $$VERS"
+
+# Bump version without creating a git tag.
+# Usage: make bump [BUMP=patch|minor|major]
+BUMP ?= patch
+bump:
 	@echo "Bumping package version ($(BUMP)) without git tag…"
 	@npm version $(BUMP) --no-git-tag-version
 	@echo "New version: $$(node -p "require('./package.json').version")"
@@ -133,7 +147,7 @@ version:
 # - publish to npm (interactive for 2FA)
 # - run scanner against published version
 # Usage: make package [BUMP=patch|minor|major]
-package: version
+package: bump
 	@set -e; \
 	VERSION=$$(node -p "require('./package.json').version"); \
 	echo "Committing release v$$VERSION"; \
@@ -147,7 +161,7 @@ package: version
 	echo "Waiting for $$VERSION to propagate…"; \
 	$(MAKE) wait-publish; \
 	echo "Running post-publish scanner for $$VERSION…"; \
-	$(MAKE) check VERSION=$$VERSION;
+	$(MAKE) check VERSION=$$VERSION || echo "Scanner failed or not yet propagated — continuing.";
 
 # Wait until npm shows the published version as latest
 wait-publish:
