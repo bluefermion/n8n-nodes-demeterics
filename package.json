@@ -58,6 +58,7 @@
     ],
     "nodes": [
       "dist/nodes/DemetericsChat/DemetericsChat.node.js",
+      "dist/nodes/DemetericsChatModel/DemetericsChatModel.node.js",
       "dist/nodes/DemetericsCohort/DemetericsCohort.node.js",
       "dist/nodes/DemetericsExtract/DemetericsExtract.node.js"
     ]
@@ -80,5 +81,7 @@
       "optional": true
     }
   },
-  "dependencies": {}
+  "dependencies": {
+    "@langchain/openai": "^0.3.17"
+  }
 }
