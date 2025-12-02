@@ -1,4 +1,4 @@
-.PHONY: install build dev lint lintfix format clean check publish help pack install-local uninstall-local install-custom uninstall-custom cli-build cli-install prepare
+.PHONY: install build dev lint lintfix format clean check publish help pack install-local uninstall-local install-custom uninstall-custom cli-build cli-install prepare verify version package
 
 # Default n8n user folder (override with: make install-custom DIR=/your/path)
 DIR ?= /opt/n8n/n8n_data
@@ -109,6 +109,39 @@ link:
 publish:
 	pnpm release
 
+# Run local validations (lint + build + custom validator)
+verify:
+	pnpm test
+
+# Bump version without creating a git tag.
+# Usage: make version [BUMP=patch|minor|major]
+BUMP ?= patch
+version:
+	@echo "Bumping package version ($(BUMP)) without git tag…"
+	@npm version $(BUMP) --no-git-tag-version
+	@echo "New version: $$(node -p "require('./package.json').version")"
+
+# End-to-end packaging and publish flow:
+# - bump version
+# - commit and push changes
+# - run validations (lint+build+validate)
+# - publish to npm (interactive for 2FA)
+# - run scanner against published version
+# Usage: make package [BUMP=patch|minor|major]
+package: version
+	@set -e; \
+	VERSION=$$(node -p "require('./package.json').version"); \
+	echo "Committing release v$$VERSION"; \
+	git add -A; \
+	git commit -m "chore: release v$$VERSION" || echo "No changes to commit"; \
+	git push origin HEAD:main; \
+	echo "Running local validations…"; \
+	pnpm test; \
+	echo "Publishing n8n-nodes-demeterics@$$VERSION to npm…"; \
+	pnpm publish --access public; \
+	echo "Running post-publish scanner…"; \
+	$(MAKE) check;
+
 # Attempt to install the n8n-node CLI globally (optional). If this fails,
 # you can still build via the fallback path in the build target.
 cli-install:
@@ -132,7 +165,10 @@ help:
 	@echo "  make format    - Format code with prettier"
 	@echo "  make clean     - Remove build artifacts"
 	@echo "  make check     - Run n8n community package scanner"
+	@echo "  make verify    - Run local validations (lint+build+validate)"
 	@echo "  make prepare   - Build with CLI, scan, and pack tarball"
+	@echo "  make version   - Bump version without git tag (BUMP=patch|minor|major)"
+	@echo "  make package   - Full flow: bump, commit, push, test, publish, scan"
 	@echo "  make link      - Instructions for local testing"
 	@echo "  make publish   - Publish to npm registry"
 	@echo "  make cli-install - Attempt to install n8n-node CLI globally"
