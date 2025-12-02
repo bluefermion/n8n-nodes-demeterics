@@ -39,12 +39,13 @@
   "packageManager": "pnpm@9.1.4",
   "main": "dist/nodes/DemetericsChat/DemetericsChat.node.js",
   "scripts": {
+    "test": "pnpm run lint && pnpm run build && node scripts/validate.mjs",
     "build": "rm -rf dist && tsc && gulp build:icons",
     "dev": "tsc --watch",
     "format": "prettier nodes credentials --write",
     "lint": "eslint \"nodes/**/*.ts\" \"credentials/**/*.ts\"",
     "lintfix": "eslint \"nodes/**/*.ts\" \"credentials/**/*.ts\" --fix",
-    "prepublishOnly": "pnpm build && pnpm lint",
+    "prepublishOnly": "pnpm test",
     "release": "pnpm run build && pnpm publish --access public"
   },
   "files": [
