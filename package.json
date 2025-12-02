@@ -37,7 +37,7 @@
     "pnpm": ">=9.0"
   },
   "packageManager": "pnpm@9.1.4",
-  "main": "dist/nodes/DemetericsCohort/DemetericsCohort.node.js",
+  "main": "dist/nodes/DemetericsChat/DemetericsChat.node.js",
   "scripts": {
     "build": "rm -rf dist && tsc && gulp build:icons",
     "dev": "tsc --watch",
@@ -56,6 +56,7 @@
       "dist/credentials/DemetericsApi.credentials.js"
     ],
     "nodes": [
+      "dist/nodes/DemetericsChat/DemetericsChat.node.js",
       "dist/nodes/DemetericsCohort/DemetericsCohort.node.js",
       "dist/nodes/DemetericsExtract/DemetericsExtract.node.js"
     ]
