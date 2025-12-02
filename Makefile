@@ -44,9 +44,14 @@ clean:
 check:
 	@echo "Running n8n community package scanner…"
 	@PKG_NAME=$$(node -p "require('./package.json').name" 2>/dev/null || echo ""); \
+	VER_ARG="$(VERSION)"; \
 	if [ -z "$$PKG_NAME" ]; then \
-		echo "Could not determine package name; skipping scan"; \
-		exit 0; \
+		echo "Could not determine package name; skipping scan"; exit 0; \
+	fi; \
+	if [ -n "$$VER_ARG" ]; then \
+		echo "Scanning $$PKG_NAME@$$VER_ARG"; \
+		npx @n8n/scan-community-package "$$PKG_NAME@$$VER_ARG"; \
+		exit $$?; \
 	fi; \
 	if npm view "$$PKG_NAME" name >/dev/null 2>&1; then \
 		npx @n8n/scan-community-package "$$PKG_NAME"; \
@@ -139,8 +144,24 @@ package: version
 	pnpm test; \
 	echo "Publishing n8n-nodes-demeterics@$$VERSION to npm…"; \
 	pnpm publish --access public; \
-	echo "Running post-publish scanner…"; \
-	$(MAKE) check;
+	echo "Waiting for $$VERSION to propagate…"; \
+	$(MAKE) wait-publish; \
+	echo "Running post-publish scanner for $$VERSION…"; \
+	$(MAKE) check VERSION=$$VERSION;
+
+# Wait until npm shows the published version as latest
+wait-publish:
+	@set -e; \
+	PKG=$$(node -p "require('./package.json').name"); \
+	VER=$$(node -p "require('./package.json').version"); \
+	echo "Waiting for $$PKG@$$VER on npm registry…"; \
+	for i in $$(seq 1 24); do \
+	  CUR=$$(npm view $$PKG version 2>/dev/null || echo ""); \
+	  if [ "$$CUR" = "$$VER" ]; then echo "Found $$PKG@$$VER"; exit 0; fi; \
+	  echo "Still sees '$$CUR' (try $$i), sleeping 5s…"; \
+	  sleep 5; \
+	done; \
+	echo "Timed out waiting for $$PKG@$$VER"; exit 1
 
 # Attempt to install the n8n-node CLI globally (optional). If this fails,
 # you can still build via the fallback path in the build target.
