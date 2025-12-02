@@ -37,7 +37,7 @@
     "pnpm": ">=9.0"
   },
   "packageManager": "pnpm@9.1.4",
-  "main": "dist/nodes/DemetericsChat/DemetericsChat.node.js",
+  "main": "dist/nodes/DemetericsCohort/DemetericsCohort.node.js",
   "scripts": {
     "build": "rm -rf dist && tsc && gulp build:icons",
     "dev": "tsc --watch",
@@ -56,7 +56,6 @@
       "dist/credentials/DemetericsApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/DemetericsChat/DemetericsChat.node.js",
       "dist/nodes/DemetericsCohort/DemetericsCohort.node.js",
       "dist/nodes/DemetericsExtract/DemetericsExtract.node.js"
     ]
@@ -74,7 +73,5 @@
   "peerDependencies": {
     "n8n-workflow": "^1.120.0"
   },
-  "dependencies": {
-    "@langchain/openai": "^0.3.0"
-  }
+  "dependencies": {}
 }

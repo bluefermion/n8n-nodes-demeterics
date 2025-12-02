@@ -139,12 +139,12 @@ export class DemetericsCohort implements INodeType {
 
         const options = {
           method: 'POST',
-          uri: `${baseUrl}/api/v1/cohort/outcome`,
+          url: `${baseUrl}/api/v1/cohort/outcome`,
           body,
           json: true,
         } as const;
 
-        const response = await this.helpers.requestWithAuthentication.call(
+        const response = await this.helpers.httpRequestWithAuthentication.call(
           this,
           'demetericsApi',
           options,
@@ -154,12 +154,12 @@ export class DemetericsCohort implements INodeType {
       } else if (operation === 'get') {
         const options = {
           method: 'GET',
-          uri: `${baseUrl}/api/v1/cohort/outcome`,
+          url: `${baseUrl}/api/v1/cohort/outcome`,
           qs: { cohort_id: cohortId },
           json: true,
         } as const;
 
-        const response = await this.helpers.requestWithAuthentication.call(
+        const response = await this.helpers.httpRequestWithAuthentication.call(
           this,
           'demetericsApi',
           options,

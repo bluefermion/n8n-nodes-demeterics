@@ -42,17 +42,17 @@ clean:
 
 # Run n8n community package scanner (for verification)
 check:
-    @echo "Running n8n community package scanner…"
-    @PKG_NAME=$$(node -p "require('./package.json').name" 2>/dev/null || echo ""); \
-    if [ -z "$$PKG_NAME" ]; then \
-        echo "Could not determine package name; skipping scan"; \
-        exit 0; \
-    fi; \
-    if npm view "$$PKG_NAME" name >/dev/null 2>&1; then \
-        npx @n8n/scan-community-package "$$PKG_NAME"; \
-    else \
-        echo "Package '$$PKG_NAME' is not published on npm yet. Skipping scanner."; \
-    fi
+	@echo "Running n8n community package scanner…"
+	@PKG_NAME=$$(node -p "require('./package.json').name" 2>/dev/null || echo ""); \
+	if [ -z "$$PKG_NAME" ]; then \
+		echo "Could not determine package name; skipping scan"; \
+		exit 0; \
+	fi; \
+	if npm view "$$PKG_NAME" name >/dev/null 2>&1; then \
+		npx @n8n/scan-community-package "$$PKG_NAME"; \
+	else \
+		echo "Package '$$PKG_NAME' is not published on npm yet. Skipping scanner."; \
+	fi
 
 # Prepare for submission: build with CLI, run scanner, create npm pack
 prepare: build check pack

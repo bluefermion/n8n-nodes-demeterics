@@ -156,12 +156,12 @@ export class DemetericsExtract implements INodeType {
 
         const createOptions = {
           method: 'POST',
-          uri: `${baseUrl}/api/v1/exports`,
+          url: `${baseUrl}/api/v1/exports`,
           body,
           json: true,
         } as const;
 
-        const createResp = await this.helpers.requestWithAuthentication.call(this, 'demetericsApi', createOptions);
+        const createResp = await this.helpers.httpRequestWithAuthentication.call(this, 'demetericsApi', createOptions);
         const requestId = createResp?.request_id as string | undefined;
 
         if (operation === 'create') {
@@ -178,9 +178,9 @@ export class DemetericsExtract implements INodeType {
 
         if (format === 'json') {
           // Try to parse JSON, fallback to NDJSON or raw text
-          const responseText = await this.helpers.requestWithAuthentication.call(this, 'demetericsApi', {
+          const responseText = await this.helpers.httpRequestWithAuthentication.call(this, 'demetericsApi', {
             method: 'GET',
-            uri: streamUrl,
+            url: streamUrl,
             json: false,
           });
 
@@ -216,9 +216,9 @@ export class DemetericsExtract implements INodeType {
           }
         } else {
           // CSV or Avro: return as binary file for downstream handling
-          const responseBody = (await this.helpers.requestWithAuthentication.call(this, 'demetericsApi', {
+          const responseBody = (await this.helpers.httpRequestWithAuthentication.call(this, 'demetericsApi', {
             method: 'GET',
-            uri: streamUrl,
+            url: streamUrl,
             json: false,
           })) as string | Buffer;
 
@@ -236,9 +236,9 @@ export class DemetericsExtract implements INodeType {
         const streamUrl = `${baseUrl}/api/v1/exports/${requestId}/stream`;
 
         if (streamFormat === 'json') {
-          const responseText = await this.helpers.requestWithAuthentication.call(this, 'demetericsApi', {
+          const responseText = await this.helpers.httpRequestWithAuthentication.call(this, 'demetericsApi', {
             method: 'GET',
-            uri: streamUrl,
+            url: streamUrl,
             json: false,
           });
 
@@ -268,9 +268,9 @@ export class DemetericsExtract implements INodeType {
             }
           }
         } else {
-          const responseBody = (await this.helpers.requestWithAuthentication.call(this, 'demetericsApi', {
+          const responseBody = (await this.helpers.httpRequestWithAuthentication.call(this, 'demetericsApi', {
             method: 'GET',
-            uri: streamUrl,
+            url: streamUrl,
             json: false,
           })) as string | Buffer;
 
