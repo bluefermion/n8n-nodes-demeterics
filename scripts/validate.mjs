@@ -57,7 +57,7 @@ async function main() {
   // Required files
   const required = [
     'dist/credentials/DemetericsApi.credentials.js',
-    'dist/nodes/DemetericsChat/DemetericsChat.node.js',
+    'dist/nodes/DemetericsChatModel/DemetericsChatModel.node.js',
     'dist/nodes/DemetericsCohort/DemetericsCohort.node.js',
     'dist/nodes/DemetericsExtract/DemetericsExtract.node.js',
   ];
@@ -72,7 +72,6 @@ async function main() {
 
   // 3) Scan built JS for disallowed patterns
   const disallowed = [
-    "@langchain/",
     "require('fs')",
     'require("fs")',
     "require('child_process')",
@@ -80,7 +79,7 @@ async function main() {
     'requestWithAuthentication(', // deprecated
   ];
   const jsGlobs = [
-    'dist/nodes/DemetericsChat/DemetericsChat.node.js',
+    'dist/nodes/DemetericsChatModel/DemetericsChatModel.node.js',
     'dist/nodes/DemetericsCohort/DemetericsCohort.node.js',
     'dist/nodes/DemetericsExtract/DemetericsExtract.node.js',
   ];
@@ -89,6 +88,10 @@ async function main() {
     const s = await fs.readFile(p, 'utf8');
     for (const bad of disallowed) {
       if (s.includes(bad)) fail(`Disallowed pattern '${bad}' in ${rel}`);
+    }
+    // Allow @langchain/* only in the Chat Model supply node
+    if (rel.includes('DemetericsChatModel') === false && s.includes('@langchain/')) {
+      fail(`Disallowed pattern '@langchain/' in ${rel}`);
     }
   }
 
@@ -139,4 +142,3 @@ main().catch((err) => {
   console.error(err);
   process.exit(1);
 });
-
