@@ -3,9 +3,10 @@
   <!-- Generator: Adobe Illustrator 29.8.3, SVG Export Plug-In . SVG Version: 2.1.1 Build 3)  -->
   <defs>
     <style>
-      .st0 {
-        fill: #269f9b;
-      }
+      /* Theme-aware: dark gray on light, white on dark */
+      svg { color: #444444; }
+      @media (prefers-color-scheme: dark) { svg { color: #ffffff; } }
+      .st0 { fill: currentColor; }
     </style>
   </defs>
   <path class="st0" d="M135.67,50.33c24.29,23.87.96,62.11-31.18,52.64-.63.24-4.63,6.69-5.45,7.8-.61.63-1.73,2.91-2.5,2.83l-4.88-6.31,9.56-11.78c1.67-1.51,4.28,0,6.27.37,42.53,3.36,34.86-52.57-3.53-52.52-13.27.94,16.58-9.71,31.72,6.96h0Z"/>
