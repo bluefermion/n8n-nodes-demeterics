@@ -25,13 +25,200 @@ Learn more at [demeterics.ai](https://demeterics.ai) or read the [documentation]
 
 ## Installation
 
-Follow the [n8n community nodes installation guide](https://docs.n8n.io/integrations/community-nodes/installation/).
+There are multiple ways to install this node depending on your n8n setup.
 
-### Quick Install
+### Option 1: GUI Install (Recommended for n8n Cloud & Desktop)
 
 1. Go to **Settings > Community Nodes** in your n8n instance
 2. Select **Install**
 3. Enter `n8n-nodes-demeterics` and confirm
+4. Restart n8n if prompted
+
+For more details, see the [n8n community nodes installation guide](https://docs.n8n.io/integrations/community-nodes/installation/).
+
+---
+
+### Option 2: Self-Hosted n8n (Docker with Custom Dockerfile)
+
+This is the **recommended approach** for Docker-based self-hosted n8n servers. It bakes the node directly into your Docker image.
+
+#### Step 1: Create a Custom Dockerfile
+
+Create a `Dockerfile` in your n8n project directory:
+
+```dockerfile
+FROM n8nio/n8n:latest
+
+USER root
+
+# Install the Demeterics node globally
+RUN npm install -g n8n-nodes-demeterics
+
+USER node
+```
+
+#### Step 2: Update docker-compose.yml
+
+Modify your `docker-compose.yml` to build from the Dockerfile instead of using the pre-built image:
+
+```yaml
+version: '3.8'
+
+services:
+  n8n:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Remove or comment out the 'image:' line if present
+    # image: n8nio/n8n:latest
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - GENERIC_TIMEZONE=America/New_York
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+volumes:
+  n8n_data:
+```
+
+#### Step 3: Build and Start
+
+```bash
+# Build the custom image
+docker-compose build
+
+# Start n8n
+docker-compose up -d
+```
+
+The Demeterics node will now appear in your n8n node panel.
+
+---
+
+### Option 3: Self-Hosted n8n (Volume Mount Method)
+
+If you prefer not to rebuild the Docker image, you can mount the node directly into the container.
+
+#### Step 1: Install the Node Locally
+
+```bash
+# Create a directory for custom nodes
+mkdir -p ~/n8n-custom-nodes
+cd ~/n8n-custom-nodes
+
+# Install the package
+npm install n8n-nodes-demeterics
+```
+
+#### Step 2: Update docker-compose.yml
+
+Add a volume mount to your `docker-compose.yml`:
+
+```yaml
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+      # Mount the custom node
+      - ~/n8n-custom-nodes/node_modules/n8n-nodes-demeterics:/home/node/.n8n/custom/node_modules/n8n-nodes-demeterics
+
+volumes:
+  n8n_data:
+```
+
+#### Step 3: Restart n8n
+
+```bash
+docker-compose restart
+```
+
+---
+
+### Option 4: Self-Hosted n8n (Manual npm Install - Non-Docker)
+
+For bare-metal or VM installations running n8n directly with Node.js:
+
+#### Step 1: Navigate to n8n Directory
+
+```bash
+cd ~/.n8n
+```
+
+#### Step 2: Install the Package
+
+```bash
+npm install n8n-nodes-demeterics
+```
+
+#### Step 3: Restart n8n
+
+```bash
+# If running as a service
+sudo systemctl restart n8n
+
+# Or if running manually, stop and start again
+n8n start
+```
+
+---
+
+### Option 5: Install from GitHub (Development/Testing)
+
+To install directly from the GitHub repository:
+
+```bash
+# Clone the repository
+git clone https://github.com/bluefermion/n8n-nodes-demeterics.git
+cd n8n-nodes-demeterics
+
+# Install dependencies
+pnpm install
+
+# Build the package
+pnpm build
+
+# Create a tarball
+npm pack
+
+# Install in your n8n custom directory
+cd ~/.n8n
+npm install /path/to/n8n-nodes-demeterics-0.1.0.tgz
+```
+
+Or install directly from GitHub:
+
+```bash
+cd ~/.n8n
+npm install git+https://github.com/bluefermion/n8n-nodes-demeterics.git
+```
+
+---
+
+### Verifying Installation
+
+After installation, verify the node is available:
+
+1. Open your n8n instance
+2. Create a new workflow
+3. Click the **+** button to add a node
+4. Search for "Demeterics"
+5. You should see **Demeterics Chat Model** in the results
+
+If the node doesn't appear, try:
+- Restarting n8n completely
+- Checking the n8n logs for errors: `docker-compose logs n8n`
+- Ensuring the package is installed in the correct location
 
 ## Getting Started
 
