@@ -288,6 +288,18 @@ export class DemetericsSpeech implements INodeType {
         placeholder: 'e.g., en, es, fr, de',
         description: 'Language code (ISO 639-1). Leave empty for auto-detection or use voice locale.',
       },
+      {
+        displayName: 'Output',
+        name: 'outputType',
+        type: 'options',
+        default: 'binary',
+        options: [
+          { name: 'Binary Data (Download Audio)', value: 'binary', description: 'Return audio as binary data for saving/processing' },
+          { name: 'URL Only', value: 'url', description: 'Return only the signed URL (expires in 15 minutes)' },
+          { name: 'Both', value: 'both', description: 'Return both binary data and URL' },
+        ],
+        description: 'How to return the generated audio',
+      },
     ],
   };
 
@@ -309,6 +321,7 @@ export class DemetericsSpeech implements INodeType {
         const format = this.getNodeParameter('format', i) as string;
         const speed = this.getNodeParameter('speed', i) as number;
         const language = this.getNodeParameter('language', i, '') as string;
+        const outputType = this.getNodeParameter('outputType', i, 'binary') as string;
 
         // Build Authorization header with BYOK support
         let authHeader = `Bearer ${demetericsApiKey}`;
@@ -337,6 +350,9 @@ export class DemetericsSpeech implements INodeType {
         }
 
         // Make request to Demeterics TTS API
+        console.log('[DemetericsSpeech] Making request to:', `${baseUrl}/tts/v1/generate`);
+        console.log('[DemetericsSpeech] Request body:', JSON.stringify(body, null, 2));
+
         const response = await this.helpers.httpRequest({
           method: 'POST',
           url: `${baseUrl}/tts/v1/generate`,
@@ -347,20 +363,90 @@ export class DemetericsSpeech implements INodeType {
           body,
         });
 
-        returnData.push({
+        console.log('[DemetericsSpeech] Response keys:', Object.keys(response));
+        console.log('[DemetericsSpeech] Has audio_base64:', !!response.audio_base64);
+        console.log('[DemetericsSpeech] Has audio:', !!response.audio);
+        console.log('[DemetericsSpeech] Has audio_url:', !!response.audio_url);
+        if (response.audio_base64) {
+          console.log('[DemetericsSpeech] audio_base64 length:', response.audio_base64.length);
+        }
+
+        const audioData: INodeExecutionData = {
           json: {
             id: response.id,
             provider: response.provider,
             model: response.model,
             voice: response.voice,
-            audio_url: response.audio_url,
             duration_seconds: response.duration_seconds,
             cost_usd: response.cost_usd,
             usage: response.usage,
             metadata: response.metadata,
           },
           pairedItem: { item: i },
-        });
+        };
+
+        const wantsBinary = outputType === 'binary' || outputType === 'both';
+        const wantsUrl = outputType === 'url' || outputType === 'both';
+
+        // Include URL in JSON if available and requested
+        if (response.audio_url && wantsUrl) {
+          (audioData.json as Record<string, unknown>).audio_url = response.audio_url;
+        }
+
+        // Handle binary data if requested
+        console.log('[DemetericsSpeech] wantsBinary:', wantsBinary, 'wantsUrl:', wantsUrl);
+
+        if (wantsBinary) {
+          let binaryData: Buffer | null = null;
+
+          // If API returned base64 audio directly
+          if (response.audio || response.audio_base64) {
+            const base64Data = response.audio || response.audio_base64;
+            console.log('[DemetericsSpeech] Converting base64 to binary, length:', base64Data.length);
+            binaryData = Buffer.from(base64Data, 'base64');
+            console.log('[DemetericsSpeech] Binary buffer size:', binaryData.length);
+          }
+          // If API returned URL and we want binary, fetch the audio
+          else if (response.audio_url) {
+            try {
+              const audioResponse = await this.helpers.httpRequest({
+                method: 'GET',
+                url: response.audio_url,
+                encoding: 'arraybuffer',
+                returnFullResponse: true,
+              });
+              binaryData = Buffer.from(audioResponse.body as ArrayBuffer);
+            } catch {
+              // If fetch fails, include URL and error
+              (audioData.json as Record<string, unknown>).audio_url = response.audio_url;
+              (audioData.json as Record<string, unknown>).binary_fetch_error = 'Failed to download audio from URL';
+            }
+          }
+
+          if (binaryData) {
+            // Determine mime type based on format
+            const mimeTypes: Record<string, string> = {
+              mp3: 'audio/mpeg',
+              wav: 'audio/wav',
+              opus: 'audio/opus',
+              flac: 'audio/flac',
+              aac: 'audio/aac',
+              ogg: 'audio/ogg',
+              pcm: 'audio/pcm',
+            };
+            const mimeType = mimeTypes[format] || 'audio/mpeg';
+            console.log('[DemetericsSpeech] Creating binary data with mimeType:', mimeType, 'filename:', `audio.${format}`);
+            audioData.binary = {
+              data: await this.helpers.prepareBinaryData(binaryData, `audio.${format}`, mimeType),
+            };
+            console.log('[DemetericsSpeech] Binary data attached to response');
+          } else {
+            console.log('[DemetericsSpeech] No binary data available');
+          }
+        }
+
+        console.log('[DemetericsSpeech] Final audioData has binary:', !!audioData.binary);
+        returnData.push(audioData);
       } catch (error) {
         if (this.continueOnFail()) {
           const errorMessage = error instanceof Error ? error.message : String(error);
