@@ -158,25 +158,26 @@ build-variants: build
 package: bump
 	@set -e; \
 	VERSION=$$(node -p "require('./package.json').version"); \
+	ROOT_DIR=$$(pwd); \
 	echo "Committing release v$$VERSION"; \
 	git add -A; \
 	git commit -m "chore: release v$$VERSION" || echo "No changes to commit"; \
 	git push origin HEAD:main; \
 	echo "Running local validations…"; \
-	pnpm test; \
+	$(PM) test; \
 	echo ""; \
 	echo "=== Building package variants ==="; \
 	node scripts/build-variants.mjs both; \
 	echo ""; \
 	echo "=== Publishing n8n-nodes-demeterics-lite@$$VERSION (n8n Cloud compatible) ==="; \
-	cd dist-variants/n8n-nodes-demeterics-lite && npm publish --access public; \
+	(cd "$$ROOT_DIR/dist-variants/n8n-nodes-demeterics-lite" && npm publish --access public); \
 	echo ""; \
 	echo "=== Publishing n8n-nodes-demeterics@$$VERSION (full, self-hosted) ==="; \
-	cd dist-variants/n8n-nodes-demeterics && npm publish --access public; \
+	(cd "$$ROOT_DIR/dist-variants/n8n-nodes-demeterics" && npm publish --access public); \
 	echo ""; \
 	echo "Waiting for packages to propagate…"; \
-	$(MAKE) wait-publish-pkg PKG=n8n-nodes-demeterics-lite VER=$$VERSION; \
-	$(MAKE) wait-publish-pkg PKG=n8n-nodes-demeterics VER=$$VERSION; \
+	$(MAKE) -C "$$ROOT_DIR" wait-publish-pkg PKG=n8n-nodes-demeterics-lite VER=$$VERSION; \
+	$(MAKE) -C "$$ROOT_DIR" wait-publish-pkg PKG=n8n-nodes-demeterics VER=$$VERSION; \
 	echo ""; \
 	echo "=== Running post-publish scanner for lite version ==="; \
 	npx @n8n/scan-community-package "n8n-nodes-demeterics-lite@$$VERSION" || echo "Scanner failed — continuing."; \

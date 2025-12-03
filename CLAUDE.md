@@ -38,6 +38,8 @@ All publish commands accept `BUMP=patch|minor|major` (default: patch).
 
 The `scripts/build-variants.mjs` script generates both package variants into `dist-variants/`.
 
+**Important:** The `make package` commands require interactive npm login (OTP/2FA). Claude cannot run these - the user must run `make package` directly in their terminal.
+
 ## Architecture
 
 ### Node Types

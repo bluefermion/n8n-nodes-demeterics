@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-demeterics",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "description": "n8n community node for Demeterics LLM Gateway - Access multiple AI providers (Groq, OpenAI, Anthropic, Google Gemini) through a unified API with built-in observability and cost tracking.",
   "keywords": [
     "n8n-community-node-package",
