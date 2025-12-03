@@ -101,7 +101,7 @@ function generateFullPackage() {
 /**
  * Write package.json variant to a staging directory
  */
-function writeVariant(variant, name) {
+function writeVariant(variant, name, isLite = false) {
   const stagingDir = path.join(rootDir, 'dist-variants', name);
 
   // Create staging directory
@@ -117,6 +117,37 @@ function writeVariant(variant, name) {
 
   if (fs.existsSync(srcDist)) {
     copyDirSync(srcDist, destDist);
+  }
+
+  // Copy LICENSE
+  const licenseSrc = path.join(rootDir, 'LICENSE');
+  if (fs.existsSync(licenseSrc)) {
+    fs.copyFileSync(licenseSrc, path.join(stagingDir, 'LICENSE'));
+  }
+
+  // Copy and modify README
+  const readmeSrc = path.join(rootDir, 'README.md');
+  if (fs.existsSync(readmeSrc)) {
+    let readme = fs.readFileSync(readmeSrc, 'utf8');
+
+    if (isLite) {
+      // Add lite version notice at the top
+      const liteNotice = `> **Note:** This is the **lite** version for n8n Cloud. It excludes the Demeterics Chat Model node (which requires LangChain).
+> For the full version with all nodes, use [\`n8n-nodes-demeterics\`](https://www.npmjs.com/package/n8n-nodes-demeterics) (self-hosted only).
+
+`;
+      // Insert after the first heading
+      readme = readme.replace(/^(# .+\n)/, `$1\n${liteNotice}`);
+    } else {
+      // Add full version notice
+      const fullNotice = `> **Note:** This is the **full** version for self-hosted n8n. It includes all nodes including the Demeterics Chat Model (LangChain-based).
+> For n8n Cloud, use [\`n8n-nodes-demeterics-lite\`](https://www.npmjs.com/package/n8n-nodes-demeterics-lite).
+
+`;
+      readme = readme.replace(/^(# .+\n)/, `$1\n${fullNotice}`);
+    }
+
+    fs.writeFileSync(path.join(stagingDir, 'README.md'), readme);
   }
 
   console.log(`Generated ${name} package at ${stagingDir}`);
@@ -161,7 +192,7 @@ function main() {
 
   if (variant === 'lite' || variant === 'both') {
     const litePackage = generateLitePackage();
-    results.lite = writeVariant(litePackage, 'n8n-nodes-demeterics-lite');
+    results.lite = writeVariant(litePackage, 'n8n-nodes-demeterics-lite', true);
     console.log(`  - Nodes: ${litePackage.n8n.nodes.length}`);
     console.log(`  - Dependencies: ${litePackage.dependencies ? Object.keys(litePackage.dependencies).join(', ') : 'none'}`);
     console.log('');
@@ -169,7 +200,7 @@ function main() {
 
   if (variant === 'full' || variant === 'both') {
     const fullPackage = generateFullPackage();
-    results.full = writeVariant(fullPackage, 'n8n-nodes-demeterics');
+    results.full = writeVariant(fullPackage, 'n8n-nodes-demeterics', false);
     console.log(`  - Nodes: ${fullPackage.n8n.nodes.length}`);
     console.log(`  - Dependencies: ${fullPackage.dependencies ? Object.keys(fullPackage.dependencies).join(', ') : 'none'}`);
     console.log('');
