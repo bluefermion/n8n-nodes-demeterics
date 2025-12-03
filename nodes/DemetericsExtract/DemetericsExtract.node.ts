@@ -13,7 +13,7 @@ export class DemetericsExtract implements INodeType {
   description: INodeTypeDescription = {
     displayName: 'Demeterics Extract',
     name: 'demetericsExtract',
-    icon: 'file:demeterics-node.svg',
+    icon: { light: 'file:demeterics-node-light.svg', dark: 'file:demeterics-node-dark.svg' },
     group: ['transform'],
     version: 1,
     description: 'Extract interaction data via the Demeterics Export API',

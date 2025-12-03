@@ -104,7 +104,7 @@ export class DemetericsChatModel implements INodeType {
   description: INodeTypeDescription = {
     displayName: 'Demeterics Chat Model',
     name: 'demetericsChatModel',
-    icon: 'file:demeterics-node.svg',
+    icon: { light: 'file:demeterics-node-light.svg', dark: 'file:demeterics-node-dark.svg' },
     group: ['transform'],
     version: 1,
     description: 'Supply an AI Chat Model via Demeterics unified API',

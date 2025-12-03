@@ -120,7 +120,7 @@ export class DemetericsChat implements INodeType {
   description: INodeTypeDescription = {
     displayName: 'Demeterics Chat',
     name: 'demetericsChat',
-    icon: 'file:demeterics-node.svg',
+    icon: { light: 'file:demeterics-node-light.svg', dark: 'file:demeterics-node-dark.svg' },
     group: ['transform'],
     version: 1,
     description: 'Make a one-pass LLM call via the Demeterics unified API',

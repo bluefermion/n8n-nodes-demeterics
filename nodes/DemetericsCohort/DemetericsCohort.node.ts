@@ -10,7 +10,7 @@ export class DemetericsCohort implements INodeType {
   description: INodeTypeDescription = {
     displayName: 'Demeterics Conversion',
     name: 'demetericsConversion',
-    icon: 'file:demeterics-node.svg',
+    icon: { light: 'file:demeterics-node-light.svg', dark: 'file:demeterics-node-dark.svg' },
     group: ['transform'],
     version: 1,
     description: 'Submit and retrieve conversion outcomes linked to a cohort_id',
