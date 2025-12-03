@@ -3,38 +3,41 @@
 # Default n8n user folder (override with: make install-custom DIR=/your/path)
 DIR ?= /opt/n8n/n8n_data
 
+# Detect package manager: prefer pnpm if available, fallback to npm
+PM := $(shell command -v pnpm >/dev/null 2>&1 && echo pnpm || echo npm)
+
 # Install dependencies
 install:
-	pnpm install
+	$(PM) install
 
 # Prefer the official n8n-node CLI when available
 # Falls back to the existing TypeScript + gulp build
 build: cli-build
 
-# Use n8n-node CLI if present, otherwise try via pnpm dlx, else fallback
+# Use n8n-node CLI if present, otherwise try via npx, else fallback
 cli-build:
 	@echo "Building with n8n-node CLI when available…"
 	@if command -v n8n-node >/dev/null 2>&1; then \
-	  n8n-node build || pnpm build; \
+	  n8n-node build || $(PM) run build; \
 	else \
-	  pnpm dlx n8n-node build || pnpm build; \
+	  npx n8n-node build || $(PM) run build; \
 	fi
 
 # Development mode with watch
 dev:
-	pnpm dev
+	$(PM) run dev
 
 # Run linter
 lint:
-	pnpm lint
+	$(PM) run lint
 
 # Fix linting issues
 lintfix:
-	pnpm lintfix
+	$(PM) run lintfix
 
 # Format code
 format:
-	pnpm format
+	$(PM) run format
 
 # Clean build artifacts
 clean:
