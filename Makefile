@@ -1,4 +1,4 @@
-.PHONY: install build dev lint lintfix format clean check publish help pack install-local uninstall-local install-custom uninstall-custom cli-build cli-install prepare verify version bump package wait-publish
+.PHONY: install build dev lint lintfix format clean check publish help pack install-local uninstall-local install-custom uninstall-custom cli-build cli-install prepare verify version bump package package-lite package-full wait-publish wait-publish-pkg build-variants
 
 # Default n8n user folder (override with: make install-custom DIR=/your/path)
 DIR ?= /opt/n8n/n8n_data
@@ -140,12 +140,17 @@ bump:
 	@npm version $(BUMP) --no-git-tag-version
 	@echo "New version: $$(node -p "require('./package.json').version")"
 
-# End-to-end packaging and publish flow:
+# Build both package variants (lite + full) into dist-variants/
+build-variants: build
+	@echo "Building package variants…"
+	@node scripts/build-variants.mjs both
+
+# End-to-end packaging and publish flow for BOTH packages:
 # - bump version
 # - commit and push changes
 # - run validations (lint+build+validate)
-# - publish to npm (interactive for 2FA)
-# - run scanner against published version
+# - publish both lite and full to npm
+# - run scanner against published versions
 # Usage: make package [BUMP=patch|minor|major]
 package: bump
 	@set -e; \
@@ -156,26 +161,83 @@ package: bump
 	git push origin HEAD:main; \
 	echo "Running local validations…"; \
 	pnpm test; \
-	echo "Publishing n8n-nodes-demeterics@$$VERSION to npm…"; \
-	pnpm publish --access public; \
-	echo "Waiting for $$VERSION to propagate…"; \
-	$(MAKE) wait-publish; \
-	echo "Running post-publish scanner for $$VERSION…"; \
-	$(MAKE) check VERSION=$$VERSION || echo "Scanner failed or not yet propagated — continuing.";
+	echo ""; \
+	echo "=== Building package variants ==="; \
+	node scripts/build-variants.mjs both; \
+	echo ""; \
+	echo "=== Publishing n8n-nodes-demeterics-lite@$$VERSION (n8n Cloud compatible) ==="; \
+	cd dist-variants/n8n-nodes-demeterics-lite && npm publish --access public; \
+	echo ""; \
+	echo "=== Publishing n8n-nodes-demeterics@$$VERSION (full, self-hosted) ==="; \
+	cd dist-variants/n8n-nodes-demeterics && npm publish --access public; \
+	echo ""; \
+	echo "Waiting for packages to propagate…"; \
+	$(MAKE) wait-publish-pkg PKG=n8n-nodes-demeterics-lite VER=$$VERSION; \
+	$(MAKE) wait-publish-pkg PKG=n8n-nodes-demeterics VER=$$VERSION; \
+	echo ""; \
+	echo "=== Running post-publish scanner for lite version ==="; \
+	npx @n8n/scan-community-package "n8n-nodes-demeterics-lite@$$VERSION" || echo "Scanner failed — continuing."; \
+	echo ""; \
+	echo "=== Done! Both packages published successfully ==="
 
-# Wait until npm shows the published version as latest
+# Publish only the lite package (n8n Cloud compatible)
+# Usage: make package-lite [BUMP=patch|minor|major]
+package-lite: bump
+	@set -e; \
+	VERSION=$$(node -p "require('./package.json').version"); \
+	echo "Committing release v$$VERSION"; \
+	git add -A; \
+	git commit -m "chore: release v$$VERSION" || echo "No changes to commit"; \
+	git push origin HEAD:main; \
+	echo "Running local validations…"; \
+	pnpm test; \
+	echo "Building lite variant…"; \
+	node scripts/build-variants.mjs lite; \
+	echo "Publishing n8n-nodes-demeterics-lite@$$VERSION to npm…"; \
+	cd dist-variants/n8n-nodes-demeterics-lite && npm publish --access public; \
+	echo "Waiting for $$VERSION to propagate…"; \
+	$(MAKE) wait-publish-pkg PKG=n8n-nodes-demeterics-lite VER=$$VERSION; \
+	echo "Running post-publish scanner…"; \
+	npx @n8n/scan-community-package "n8n-nodes-demeterics-lite@$$VERSION" || echo "Scanner failed — continuing."
+
+# Publish only the full package (self-hosted, includes LangChain)
+# Usage: make package-full [BUMP=patch|minor|major]
+package-full: bump
+	@set -e; \
+	VERSION=$$(node -p "require('./package.json').version"); \
+	echo "Committing release v$$VERSION"; \
+	git add -A; \
+	git commit -m "chore: release v$$VERSION" || echo "No changes to commit"; \
+	git push origin HEAD:main; \
+	echo "Running local validations…"; \
+	pnpm test; \
+	echo "Building full variant…"; \
+	node scripts/build-variants.mjs full; \
+	echo "Publishing n8n-nodes-demeterics@$$VERSION to npm…"; \
+	cd dist-variants/n8n-nodes-demeterics && npm publish --access public; \
+	echo "Waiting for $$VERSION to propagate…"; \
+	$(MAKE) wait-publish-pkg PKG=n8n-nodes-demeterics VER=$$VERSION; \
+	echo "Note: Full package includes LangChain — scanner will report violations (expected).";
+
+# Wait until npm shows the published version as latest (uses package.json name)
 wait-publish:
 	@set -e; \
 	PKG=$$(node -p "require('./package.json').name"); \
 	VER=$$(node -p "require('./package.json').version"); \
-	echo "Waiting for $$PKG@$$VER on npm registry…"; \
+	$(MAKE) wait-publish-pkg PKG=$$PKG VER=$$VER
+
+# Wait for a specific package@version to appear on npm
+# Usage: make wait-publish-pkg PKG=package-name VER=1.0.0
+wait-publish-pkg:
+	@set -e; \
+	echo "Waiting for $(PKG)@$(VER) on npm registry…"; \
 	for i in $$(seq 1 24); do \
-	  CUR=$$(npm view $$PKG version 2>/dev/null || echo ""); \
-	  if [ "$$CUR" = "$$VER" ]; then echo "Found $$PKG@$$VER"; exit 0; fi; \
+	  CUR=$$(npm view $(PKG) version 2>/dev/null || echo ""); \
+	  if [ "$$CUR" = "$(VER)" ]; then echo "Found $(PKG)@$(VER)"; exit 0; fi; \
 	  echo "Still sees '$$CUR' (try $$i), sleeping 5s…"; \
 	  sleep 5; \
 	done; \
-	echo "Timed out waiting for $$PKG@$$VER"; exit 1
+	echo "Timed out waiting for $(PKG)@$(VER)"; exit 1
 
 # Attempt to install the n8n-node CLI globally (optional). If this fails,
 # you can still build via the fallback path in the build target.
@@ -192,18 +254,30 @@ help:
 	@echo "n8n-nodes-demeterics Makefile"
 	@echo ""
 	@echo "Usage:"
-	@echo "  make install   - Install dependencies"
-	@echo "  make build     - Build the package (prefers n8n-node CLI)"
-	@echo "  make dev       - Watch mode for development"
-	@echo "  make lint      - Run linter"
-	@echo "  make lintfix   - Fix linting issues"
-	@echo "  make format    - Format code with prettier"
-	@echo "  make clean     - Remove build artifacts"
-	@echo "  make check     - Run n8n community package scanner"
-	@echo "  make verify    - Run local validations (lint+build+validate)"
-	@echo "  make prepare   - Build with CLI, scan, and pack tarball"
-	@echo "  make version   - Bump version without git tag (BUMP=patch|minor|major)"
-	@echo "  make package   - Full flow: bump, commit, push, test, publish, scan"
-	@echo "  make link      - Instructions for local testing"
-	@echo "  make publish   - Publish to npm registry"
-	@echo "  make cli-install - Attempt to install n8n-node CLI globally"
+	@echo "  make install       - Install dependencies"
+	@echo "  make build         - Build the package (prefers n8n-node CLI)"
+	@echo "  make build-variants- Build both lite and full package variants"
+	@echo "  make dev           - Watch mode for development"
+	@echo "  make lint          - Run linter"
+	@echo "  make lintfix       - Fix linting issues"
+	@echo "  make format        - Format code with prettier"
+	@echo "  make clean         - Remove build artifacts"
+	@echo "  make check         - Run n8n community package scanner"
+	@echo "  make verify        - Run local validations (lint+build+validate)"
+	@echo "  make prepare       - Build with CLI, scan, and pack tarball"
+	@echo "  make bump          - Bump version without git tag (BUMP=patch|minor|major)"
+	@echo ""
+	@echo "Publishing (all use BUMP=patch|minor|major):"
+	@echo "  make package       - Publish BOTH lite + full packages"
+	@echo "  make package-lite  - Publish only n8n-nodes-demeterics-lite (n8n Cloud)"
+	@echo "  make package-full  - Publish only n8n-nodes-demeterics (self-hosted)"
+	@echo ""
+	@echo "Package variants:"
+	@echo "  n8n-nodes-demeterics-lite - Verified, n8n Cloud compatible (no LangChain)"
+	@echo "  n8n-nodes-demeterics      - Full version with ChatModel (self-hosted only)"
+	@echo ""
+	@echo "Other:"
+	@echo "  make link          - Instructions for local testing"
+	@echo "  make publish       - Publish to npm registry (legacy)"
+	@echo "  make cli-install   - Attempt to install n8n-node CLI globally"
+	@echo "  make version       - Show local and npm registry versions"
