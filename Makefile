@@ -176,8 +176,15 @@ package: bump
 	(cd "$$ROOT_DIR/dist-variants/n8n-nodes-demeterics" && npm publish --access public); \
 	echo ""; \
 	echo "Waiting for packages to propagate…"; \
-	$(MAKE) -C "$$ROOT_DIR" wait-publish-pkg PKG=n8n-nodes-demeterics-lite VER=$$VERSION; \
-	$(MAKE) -C "$$ROOT_DIR" wait-publish-pkg PKG=n8n-nodes-demeterics VER=$$VERSION; \
+	for PKG in n8n-nodes-demeterics-lite n8n-nodes-demeterics; do \
+	  echo "Waiting for $$PKG@$$VERSION…"; \
+	  for i in $$(seq 1 24); do \
+	    CUR=$$(npm view $$PKG version 2>/dev/null || echo ""); \
+	    if [ "$$CUR" = "$$VERSION" ]; then echo "Found $$PKG@$$VERSION"; break; fi; \
+	    echo "  Still sees '$$CUR' (try $$i), sleeping 5s…"; \
+	    sleep 5; \
+	  done; \
+	done; \
 	echo ""; \
 	echo "=== Running post-publish scanner for lite version ==="; \
 	npx @n8n/scan-community-package "n8n-nodes-demeterics-lite@$$VERSION" || echo "Scanner failed — continuing."; \
@@ -189,18 +196,24 @@ package: bump
 package-lite: bump
 	@set -e; \
 	VERSION=$$(node -p "require('./package.json').version"); \
+	ROOT_DIR=$$(pwd); \
 	echo "Committing release v$$VERSION"; \
 	git add -A; \
 	git commit -m "chore: release v$$VERSION" || echo "No changes to commit"; \
 	git push origin HEAD:main; \
 	echo "Running local validations…"; \
-	pnpm test; \
+	$(PM) test; \
 	echo "Building lite variant…"; \
 	node scripts/build-variants.mjs lite; \
 	echo "Publishing n8n-nodes-demeterics-lite@$$VERSION to npm…"; \
-	cd dist-variants/n8n-nodes-demeterics-lite && npm publish --access public; \
+	(cd "$$ROOT_DIR/dist-variants/n8n-nodes-demeterics-lite" && npm publish --access public); \
 	echo "Waiting for $$VERSION to propagate…"; \
-	$(MAKE) wait-publish-pkg PKG=n8n-nodes-demeterics-lite VER=$$VERSION; \
+	for i in $$(seq 1 24); do \
+	  CUR=$$(npm view n8n-nodes-demeterics-lite version 2>/dev/null || echo ""); \
+	  if [ "$$CUR" = "$$VERSION" ]; then echo "Found n8n-nodes-demeterics-lite@$$VERSION"; break; fi; \
+	  echo "  Still sees '$$CUR' (try $$i), sleeping 5s…"; \
+	  sleep 5; \
+	done; \
 	echo "Running post-publish scanner…"; \
 	npx @n8n/scan-community-package "n8n-nodes-demeterics-lite@$$VERSION" || echo "Scanner failed — continuing."
 
@@ -209,19 +222,25 @@ package-lite: bump
 package-full: bump
 	@set -e; \
 	VERSION=$$(node -p "require('./package.json').version"); \
+	ROOT_DIR=$$(pwd); \
 	echo "Committing release v$$VERSION"; \
 	git add -A; \
 	git commit -m "chore: release v$$VERSION" || echo "No changes to commit"; \
 	git push origin HEAD:main; \
 	echo "Running local validations…"; \
-	pnpm test; \
+	$(PM) test; \
 	echo "Building full variant…"; \
 	node scripts/build-variants.mjs full; \
 	echo "Publishing n8n-nodes-demeterics@$$VERSION to npm…"; \
-	cd dist-variants/n8n-nodes-demeterics && npm publish --access public; \
+	(cd "$$ROOT_DIR/dist-variants/n8n-nodes-demeterics" && npm publish --access public); \
 	echo "Waiting for $$VERSION to propagate…"; \
-	$(MAKE) wait-publish-pkg PKG=n8n-nodes-demeterics VER=$$VERSION; \
-	echo "Note: Full package includes LangChain — scanner will report violations (expected).";
+	for i in $$(seq 1 24); do \
+	  CUR=$$(npm view n8n-nodes-demeterics version 2>/dev/null || echo ""); \
+	  if [ "$$CUR" = "$$VERSION" ]; then echo "Found n8n-nodes-demeterics@$$VERSION"; break; fi; \
+	  echo "  Still sees '$$CUR' (try $$i), sleeping 5s…"; \
+	  sleep 5; \
+	done; \
+	echo "Note: Full package includes LangChain — scanner will report violations (expected)."
 
 # Wait until npm shows the published version as latest (uses package.json name)
 wait-publish:
