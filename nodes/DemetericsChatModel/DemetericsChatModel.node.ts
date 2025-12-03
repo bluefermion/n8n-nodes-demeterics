@@ -4,101 +4,18 @@ import type {
   INodeTypeDescription,
   ISupplyDataFunctions,
   SupplyData,
-  INodeProperties,
   INodePropertyOptions,
 } from 'n8n-workflow';
 import { NodeConnectionTypes } from 'n8n-workflow';
 
-// Provider configurations with their supported models.
-const PROVIDERS: Record<string, { name: string; models: INodePropertyOptions[] }> = {
-  groq: {
-    name: 'Groq',
-    models: [
-      { name: 'Llama 3.3 70B Versatile', value: 'llama-3.3-70b-versatile' },
-      { name: 'Llama 3.1 8B Instant', value: 'llama-3.1-8b-instant' },
-      { name: 'Llama 4 Maverick 17B', value: 'meta-llama/llama-4-maverick-17b-128e-instruct' },
-      { name: 'Llama 4 Scout 17B', value: 'meta-llama/llama-4-scout-17b-16e-instruct' },
-      { name: 'Compound (Multi-model)', value: 'groq/compound' },
-      { name: 'Compound Mini', value: 'groq/compound-mini' },
-      { name: 'Qwen3 32B', value: 'qwen/qwen3-32b' },
-      { name: 'Kimi K2 Instruct', value: 'moonshotai/kimi-k2-instruct' },
-      { name: 'GPT-OSS 120B', value: 'openai/gpt-oss-120b' },
-      { name: 'GPT-OSS 20B', value: 'openai/gpt-oss-20b' },
-    ],
-  },
-  openai: {
-    name: 'OpenAI',
-    models: [
-      { name: 'GPT-5', value: 'gpt-5' },
-      { name: 'GPT-5 Mini', value: 'gpt-5-mini' },
-      { name: 'GPT-5 Nano', value: 'gpt-5-nano' },
-      { name: 'GPT-5 Codex', value: 'gpt-5-codex' },
-      { name: 'GPT-4.1', value: 'gpt-4.1' },
-      { name: 'GPT-4.1 Mini', value: 'gpt-4.1-mini' },
-      { name: 'GPT-4.1 Nano', value: 'gpt-4.1-nano' },
-      { name: 'GPT-4o', value: 'gpt-4o' },
-      { name: 'GPT-4o Mini', value: 'gpt-4o-mini' },
-      { name: 'GPT-4o Search Preview', value: 'gpt-4o-search-preview' },
-      { name: 'GPT-4 Turbo', value: 'gpt-4-turbo' },
-      { name: 'GPT-3.5 Turbo', value: 'gpt-3.5-turbo' },
-    ],
-  },
-  anthropic: {
-    name: 'Anthropic',
-    models: [
-      { name: 'Claude Opus 4.5', value: 'claude-opus-4-5' },
-      { name: 'Claude Opus 4.1', value: 'claude-opus-4-1' },
-      { name: 'Claude 3 Opus', value: 'claude-3-opus-20240229' },
-      { name: 'Claude Sonnet 4.5', value: 'claude-sonnet-4-5' },
-      { name: 'Claude Sonnet 4', value: 'claude-sonnet-4' },
-      { name: 'Claude 3.7 Sonnet', value: 'claude-3-7-sonnet' },
-      { name: 'Claude 3.5 Sonnet', value: 'claude-3-5-sonnet-20241022' },
-      { name: 'Claude Haiku 4.5', value: 'claude-haiku-4-5' },
-      { name: 'Claude 3.5 Haiku', value: 'claude-3-5-haiku-20241022' },
-    ],
-  },
-  google: {
-    name: 'Google',
-    models: [
-      { name: 'Gemini 3 Pro Preview', value: 'gemini-3-pro-preview' },
-      { name: 'Gemini 2.5 Pro', value: 'gemini-2.5-pro' },
-      { name: 'Gemini 2.5 Flash', value: 'gemini-2.5-flash' },
-      { name: 'Gemini 2.5 Flash Lite', value: 'gemini-2.5-flash-lite' },
-      { name: 'Gemini 2.0 Flash', value: 'gemini-2.0-flash' },
-      { name: 'Gemini 2.0 Flash Lite', value: 'gemini-2.0-flash-lite' },
-      { name: 'Gemini 1.5 Pro', value: 'gemini-1.5-pro' },
-      { name: 'Gemini 1.5 Flash', value: 'gemini-1.5-flash' },
-    ],
-  },
-  openrouter: {
-    name: 'OpenRouter',
-    models: [
-      { name: 'OpenRouter Auto', value: 'openrouter/auto' },
-      { name: 'Claude 3.5 Sonnet', value: 'anthropic/claude-3.5-sonnet' },
-      { name: 'Gemini 1.5 Pro', value: 'google/gemini-1.5-pro' },
-      { name: 'Llama 3.1 70B Instruct', value: 'meta-llama/llama-3.1-70b-instruct' },
-      { name: 'Qwen 2.5 72B Instruct', value: 'qwen/qwen-2.5-72b-instruct' },
-      { name: 'Mixtral 8x7B Instruct', value: 'mistralai/mixtral-8x7b-instruct' },
-    ],
-  },
-};
-
-const providerOptions: INodePropertyOptions[] = Object.entries(PROVIDERS).map(([key, value]) => ({
-  name: value.name,
-  value: key,
-}));
-
-const modelProperties: INodeProperties[] = Object.entries(PROVIDERS).map(([providerKey, provider]) => ({
-  displayName: 'Model',
-  name: 'model',
-  type: 'options',
-  default: provider.models[0]?.value || '',
-  options: provider.models,
-  displayOptions: {
-    show: { provider: [providerKey] },
-  },
-  description: `Select the ${provider.name} model to use`,
-}));
+// Provider options for the dropdown.
+const providerOptions: INodePropertyOptions[] = [
+  { name: 'Groq', value: 'groq' },
+  { name: 'OpenAI', value: 'openai' },
+  { name: 'Anthropic', value: 'anthropic' },
+  { name: 'Google', value: 'google' },
+  { name: 'OpenRouter', value: 'openrouter' },
+];
 
 export class DemetericsChatModel implements INodeType {
   description: INodeTypeDescription = {
@@ -120,7 +37,15 @@ export class DemetericsChatModel implements INodeType {
     credentials: [{ name: 'demetericsApi', required: true }],
     properties: [
       { displayName: 'Provider', name: 'provider', type: 'options', default: 'groq', options: providerOptions },
-      ...modelProperties,
+      {
+        displayName: 'Model',
+        name: 'model',
+        type: 'string',
+        default: 'llama-3.3-70b-versatile',
+        placeholder: 'e.g., groq/compound, llama-3.3-70b-versatile',
+        description: 'The model ID to use. See provider documentation for available models.',
+        hint: 'Groq: groq/compound, llama-3.3-70b-versatile | OpenAI: gpt-4o, gpt-4-turbo | Anthropic: claude-sonnet-4',
+      },
       {
         displayName: 'Options',
         name: 'options',
