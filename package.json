@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-demeterics",
-  "version": "0.1.25",
+  "version": "0.1.26",
   "description": "n8n community node for Demeterics LLM Gateway - Access multiple AI providers (Groq, OpenAI, Anthropic, Google Gemini) through a unified API with built-in observability and cost tracking.",
   "keywords": [
     "n8n-community-node-package",
@@ -17,7 +17,15 @@
     "langchain",
     "chat-model",
     "ai-gateway",
-    "llm-gateway"
+    "llm-gateway",
+    "tts",
+    "text-to-speech",
+    "speech-generation",
+    "image-generation",
+    "dall-e",
+    "imagen",
+    "stability-ai",
+    "elevenlabs"
   ],
   "license": "MIT",
   "homepage": "https://demeterics.com",
@@ -60,7 +68,9 @@
       "dist/nodes/DemetericsChat/DemetericsChat.node.js",
       "dist/nodes/DemetericsChatModel/DemetericsChatModel.node.js",
       "dist/nodes/DemetericsCohort/DemetericsCohort.node.js",
-      "dist/nodes/DemetericsExtract/DemetericsExtract.node.js"
+      "dist/nodes/DemetericsExtract/DemetericsExtract.node.js",
+      "dist/nodes/DemetericsSpeech/DemetericsSpeech.node.js",
+      "dist/nodes/DemetericsImage/DemetericsImage.node.js"
     ]
   },
   "devDependencies": {
