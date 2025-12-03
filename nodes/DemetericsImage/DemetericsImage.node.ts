@@ -23,15 +23,18 @@ const providerToCredentialKey: Record<string, string> = {
 // Model options per provider
 const modelOptions: Record<string, INodePropertyOptions[]> = {
   openai: [
-    { name: 'GPT Image 1', value: 'gpt-image-1' },
+    { name: 'GPT Image 1 (Premium)', value: 'gpt-image-1' },
+    { name: 'GPT Image 1 Mini (~70% cheaper)', value: 'gpt-image-1-mini' },
   ],
   google: [
     { name: 'Imagen 3.0 Generate', value: 'imagen-3.0-generate-002' },
     { name: 'Imagen 3.0 Fast', value: 'imagen-3.0-fast-generate-001' },
   ],
   stability: [
-    { name: 'Stable Image Ultra', value: 'stable-image-ultra' },
+    { name: 'Stable Image Ultra (Highest Quality)', value: 'stable-image-ultra' },
     { name: 'Stable Image Core', value: 'stable-image-core' },
+    { name: 'SD3 Large', value: 'sd3-large' },
+    { name: 'SD3 Medium', value: 'sd3-medium' },
     { name: 'SDXL 1.0', value: 'stable-diffusion-xl-1024-v1-0' },
     { name: 'SD 1.6', value: 'stable-diffusion-v1-6' },
   ],
@@ -41,8 +44,10 @@ const modelOptions: Record<string, INodePropertyOptions[]> = {
 const sizeOptions: Record<string, INodePropertyOptions[]> = {
   openai: [
     { name: '1024x1024 (Square)', value: '1024x1024' },
-    { name: '1792x1024 (Landscape)', value: '1792x1024' },
-    { name: '1024x1792 (Portrait)', value: '1024x1792' },
+    { name: '1536x1024 (Landscape)', value: '1536x1024' },
+    { name: '1024x1536 (Portrait)', value: '1024x1536' },
+    { name: '1792x1024 (Wide Landscape)', value: '1792x1024' },
+    { name: '1024x1792 (Tall Portrait)', value: '1024x1792' },
   ],
   google: [
     { name: '1024x1024', value: '1024x1024' },
@@ -196,10 +201,11 @@ export class DemetericsImage implements INodeType {
         displayName: 'Quality',
         name: 'quality',
         type: 'options',
-        default: 'standard',
+        default: 'medium',
         options: [
-          { name: 'Standard', value: 'standard' },
-          { name: 'HD', value: 'hd' },
+          { name: 'Low (Fastest, lowest cost)', value: 'low' },
+          { name: 'Medium (Balanced)', value: 'medium' },
+          { name: 'High (Highest detail)', value: 'high' },
         ],
         displayOptions: {
           show: {
@@ -242,6 +248,18 @@ export class DemetericsImage implements INodeType {
         default: 0,
         description: 'Seed for reproducibility (0 for random)',
       },
+      {
+        displayName: 'Output',
+        name: 'outputType',
+        type: 'options',
+        default: 'binary',
+        options: [
+          { name: 'Binary Data (Download Image)', value: 'binary', description: 'Return image as binary data for saving/processing' },
+          { name: 'URL Only', value: 'url', description: 'Return only the signed URL (expires in 15 minutes)' },
+          { name: 'Both', value: 'both', description: 'Return both binary data and URL' },
+        ],
+        description: 'How to return the generated image',
+      },
     ],
   };
 
@@ -263,9 +281,10 @@ export class DemetericsImage implements INodeType {
         const size = this.getNodeParameter('size', i) as string;
         const n = this.getNodeParameter('n', i) as number;
         const seed = this.getNodeParameter('seed', i) as number;
+        const outputType = this.getNodeParameter('outputType', i, 'binary') as string;
 
         // Get provider-specific options
-        let quality = 'standard';
+        let quality = 'medium';
         let style = 'natural';
         if (provider === 'openai') {
           quality = this.getNodeParameter('quality', i) as string;
@@ -318,15 +337,15 @@ export class DemetericsImage implements INodeType {
         // Return each image as a separate item if multiple
         const images = response.images || [];
         for (let j = 0; j < images.length; j++) {
-          returnData.push({
+          const image = images[j];
+          const imageData: INodeExecutionData = {
             json: {
               id: response.id,
               provider: response.provider,
               model: response.model,
-              image_url: images[j].url,
-              width: images[j].width,
-              height: images[j].height,
-              size_bytes: images[j].size_bytes,
+              width: image.width || response.usage?.resolution?.split('x')[0],
+              height: image.height || response.usage?.resolution?.split('x')[1],
+              size_bytes: image.size_bytes,
               cost_usd: response.cost_usd / images.length, // Cost per image
               total_cost_usd: response.cost_usd,
               usage: response.usage,
@@ -335,7 +354,52 @@ export class DemetericsImage implements INodeType {
               seed: response.metadata?.seed,
             },
             pairedItem: { item: i },
-          });
+          };
+
+          const wantsBinary = outputType === 'binary' || outputType === 'both';
+          const wantsUrl = outputType === 'url' || outputType === 'both';
+
+          // Include URL in JSON if requested
+          if (image.url && wantsUrl) {
+            (imageData.json as Record<string, unknown>).image_url = image.url;
+          }
+
+          // Handle binary data if requested
+          if (wantsBinary) {
+            let binaryData: Buffer | null = null;
+
+            // If API returned base64, use it directly
+            if (image.base64) {
+              binaryData = Buffer.from(image.base64, 'base64');
+            }
+            // If API returned URL and we want binary, fetch the image
+            else if (image.url) {
+              try {
+                const imageResponse = await this.helpers.httpRequest({
+                  method: 'GET',
+                  url: image.url,
+                  encoding: 'arraybuffer',
+                  returnFullResponse: true,
+                });
+                binaryData = Buffer.from(imageResponse.body as ArrayBuffer);
+              } catch {
+                // If fetch fails, just include URL
+                (imageData.json as Record<string, unknown>).image_url = image.url;
+                (imageData.json as Record<string, unknown>).binary_fetch_error = 'Failed to download image from URL';
+              }
+            }
+
+            if (binaryData) {
+              // Detect mime type from response or default to PNG
+              const mimeType = image.mime_type || 'image/png';
+              const extension = mimeType.split('/')[1] || 'png';
+              imageData.binary = {
+                data: await this.helpers.prepareBinaryData(binaryData, `image.${extension}`, mimeType),
+              };
+            }
+          }
+
+          returnData.push(imageData);
         }
       } catch (error) {
         if (this.continueOnFail()) {

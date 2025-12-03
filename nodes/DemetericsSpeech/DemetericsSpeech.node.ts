@@ -10,7 +10,8 @@ import type {
 const providerOptions: INodePropertyOptions[] = [
   { name: 'OpenAI', value: 'openai' },
   { name: 'ElevenLabs', value: 'elevenlabs' },
-  { name: 'Google', value: 'google' },
+  { name: 'Google Cloud TTS', value: 'google' },
+  { name: 'Murf.ai', value: 'murf' },
 ];
 
 // Map provider to credential field names for BYOK.
@@ -18,17 +19,23 @@ const providerToCredentialKey: Record<string, string> = {
   openai: 'providerApiKeyOpenAI',
   elevenlabs: 'providerApiKeyElevenLabs',
   google: 'providerApiKeyGemini',
+  murf: 'providerApiKeyMurf',
 };
 
 // Voice options per provider
 const voiceOptions: Record<string, INodePropertyOptions[]> = {
   openai: [
-    { name: 'Alloy', value: 'alloy' },
-    { name: 'Echo', value: 'echo' },
-    { name: 'Fable', value: 'fable' },
-    { name: 'Onyx', value: 'onyx' },
-    { name: 'Nova', value: 'nova' },
-    { name: 'Shimmer', value: 'shimmer' },
+    { name: 'Alloy - Neutral and balanced', value: 'alloy' },
+    { name: 'Ash - Warm and conversational', value: 'ash' },
+    { name: 'Ballad - Soft and melodic', value: 'ballad' },
+    { name: 'Coral - Friendly and approachable', value: 'coral' },
+    { name: 'Echo - Clear and articulate', value: 'echo' },
+    { name: 'Fable - Expressive and dynamic', value: 'fable' },
+    { name: 'Nova - Friendly and warm', value: 'nova' },
+    { name: 'Onyx - Deep and authoritative', value: 'onyx' },
+    { name: 'Sage - Calm and measured', value: 'sage' },
+    { name: 'Shimmer - Bright and optimistic', value: 'shimmer' },
+    { name: 'Verse - Dynamic and engaging', value: 'verse' },
   ],
   elevenlabs: [
     { name: 'Rachel', value: 'rachel' },
@@ -53,25 +60,44 @@ const voiceOptions: Record<string, INodePropertyOptions[]> = {
     { name: 'en-US-Wavenet-D', value: 'en-US-Wavenet-D' },
     { name: 'en-US-Neural2-A', value: 'en-US-Neural2-A' },
     { name: 'en-US-Neural2-C', value: 'en-US-Neural2-C' },
+    { name: 'en-US-Journey-D', value: 'en-US-Journey-D' },
+    { name: 'en-US-Studio-M', value: 'en-US-Studio-M' },
+    { name: 'en-US-Studio-O', value: 'en-US-Studio-O' },
+  ],
+  murf: [
+    { name: 'Natalie (US English, Female)', value: 'en-US-natalie' },
+    { name: 'Miles (US English, Male)', value: 'en-US-miles' },
+    { name: 'Julia (US English, Female)', value: 'en-US-julia' },
+    { name: 'Iris (UK English, Female)', value: 'en-UK-iris' },
+    { name: 'Elena (Spanish, Female)', value: 'es-ES-elena' },
+    { name: 'Claire (French, Female)', value: 'fr-FR-claire' },
+    { name: 'Anna (German, Female)', value: 'de-DE-anna' },
   ],
 };
 
 // Model options per provider
 const modelOptions: Record<string, INodePropertyOptions[]> = {
   openai: [
-    { name: 'TTS-1 (Fast)', value: 'tts-1' },
-    { name: 'TTS-1-HD (High Quality)', value: 'tts-1-hd' },
+    { name: 'GPT-4o Mini TTS (Latest, ~85% cheaper)', value: 'gpt-4o-mini-tts' },
+    { name: 'TTS-1 (Fast, legacy)', value: 'tts-1' },
+    { name: 'TTS-1-HD (High Quality, legacy)', value: 'tts-1-hd' },
   ],
   elevenlabs: [
-    { name: 'Eleven Multilingual v2', value: 'eleven_multilingual_v2' },
-    { name: 'Eleven Turbo v2.5', value: 'eleven_turbo_v2_5' },
+    { name: 'Eleven Multilingual v2 (Best, 29 languages)', value: 'eleven_multilingual_v2' },
+    { name: 'Eleven Turbo v2.5 (Fast, English)', value: 'eleven_turbo_v2_5' },
     { name: 'Eleven Turbo v2', value: 'eleven_turbo_v2' },
-    { name: 'Eleven Monolingual v1', value: 'eleven_monolingual_v1' },
+    { name: 'Eleven Monolingual v1 (English only)', value: 'eleven_monolingual_v1' },
   ],
   google: [
     { name: 'Standard', value: 'standard' },
-    { name: 'WaveNet', value: 'wavenet' },
-    { name: 'Neural2', value: 'neural2' },
+    { name: 'WaveNet (High Quality)', value: 'wavenet' },
+    { name: 'Neural2 (Neural Network)', value: 'neural2' },
+    { name: 'Journey (Conversational)', value: 'journey' },
+    { name: 'Studio (Professional)', value: 'studio' },
+  ],
+  murf: [
+    { name: 'GEN2 (Latest, Highest Quality)', value: 'GEN2' },
+    { name: 'FALCON (Fast Streaming)', value: 'FALCON' },
   ],
 };
 
@@ -109,11 +135,12 @@ export class DemetericsSpeech implements INodeType {
         options: providerOptions,
         description: 'Select the TTS provider',
       },
+      // Model options per provider
       {
         displayName: 'Model',
         name: 'model',
         type: 'options',
-        default: 'tts-1',
+        default: 'gpt-4o-mini-tts',
         options: modelOptions.openai,
         displayOptions: {
           show: {
@@ -148,6 +175,20 @@ export class DemetericsSpeech implements INodeType {
         },
         description: 'Google Cloud TTS model',
       },
+      {
+        displayName: 'Model',
+        name: 'model',
+        type: 'options',
+        default: 'GEN2',
+        options: modelOptions.murf,
+        displayOptions: {
+          show: {
+            provider: ['murf'],
+          },
+        },
+        description: 'Murf.ai TTS model',
+      },
+      // Voice options per provider
       {
         displayName: 'Voice',
         name: 'voice',
@@ -188,6 +229,19 @@ export class DemetericsSpeech implements INodeType {
         description: 'Voice to use for speech generation',
       },
       {
+        displayName: 'Voice',
+        name: 'voice',
+        type: 'options',
+        default: 'en-US-natalie',
+        options: voiceOptions.murf,
+        displayOptions: {
+          show: {
+            provider: ['murf'],
+          },
+        },
+        description: 'Voice to use for speech generation',
+      },
+      {
         displayName: 'Text',
         name: 'text',
         type: 'string',
@@ -196,7 +250,7 @@ export class DemetericsSpeech implements INodeType {
         typeOptions: {
           rows: 4,
         },
-        description: 'Text to convert to speech',
+        description: 'Text to convert to speech (max varies by provider: OpenAI 4096, ElevenLabs 5000, Google 5000, Murf 10000)',
       },
       {
         displayName: 'Output Format',
@@ -208,8 +262,11 @@ export class DemetericsSpeech implements INodeType {
           { name: 'WAV', value: 'wav' },
           { name: 'Opus', value: 'opus' },
           { name: 'FLAC', value: 'flac' },
+          { name: 'AAC', value: 'aac' },
+          { name: 'OGG', value: 'ogg' },
+          { name: 'PCM', value: 'pcm' },
         ],
-        description: 'Audio output format',
+        description: 'Audio output format (availability varies by provider)',
       },
       {
         displayName: 'Speed',
@@ -222,6 +279,14 @@ export class DemetericsSpeech implements INodeType {
           numberStepSize: 0.1,
         },
         description: 'Playback speed (0.25 to 4.0)',
+      },
+      {
+        displayName: 'Language',
+        name: 'language',
+        type: 'string',
+        default: '',
+        placeholder: 'e.g., en, es, fr, de',
+        description: 'Language code (ISO 639-1). Leave empty for auto-detection or use voice locale.',
       },
     ],
   };
@@ -243,6 +308,7 @@ export class DemetericsSpeech implements INodeType {
         const text = this.getNodeParameter('text', i) as string;
         const format = this.getNodeParameter('format', i) as string;
         const speed = this.getNodeParameter('speed', i) as number;
+        const language = this.getNodeParameter('language', i, '') as string;
 
         // Build Authorization header with BYOK support
         let authHeader = `Bearer ${demetericsApiKey}`;
@@ -256,6 +322,20 @@ export class DemetericsSpeech implements INodeType {
           }
         }
 
+        // Build request body
+        const body: Record<string, unknown> = {
+          provider,
+          model,
+          voice,
+          input: text,
+          format,
+          speed,
+        };
+
+        if (language) {
+          body.language = language;
+        }
+
         // Make request to Demeterics TTS API
         const response = await this.helpers.httpRequest({
           method: 'POST',
@@ -264,14 +344,7 @@ export class DemetericsSpeech implements INodeType {
             'Authorization': authHeader,
             'Content-Type': 'application/json',
           },
-          body: {
-            provider,
-            model,
-            voice,
-            input: text,
-            format,
-            speed,
-          },
+          body,
         });
 
         returnData.push({

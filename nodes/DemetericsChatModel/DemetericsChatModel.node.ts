@@ -3,6 +3,7 @@ import type {
   INodeType,
   INodeTypeDescription,
   ISupplyDataFunctions,
+  ILoadOptionsFunctions,
   SupplyData,
   INodePropertyOptions,
 } from 'n8n-workflow';
@@ -16,6 +17,69 @@ const providerOptions: INodePropertyOptions[] = [
   { name: 'Google', value: 'google' },
   { name: 'OpenRouter', value: 'openrouter' },
 ];
+
+// Map provider keys to Demeterics API path segments.
+const providerBaseMap: Record<string, string> = {
+  groq: 'groq',
+  openai: 'openai',
+  anthropic: 'anthropic',
+  google: 'google',
+  openrouter: 'openrouter',
+};
+
+// Map provider keys to credential field names for BYOK.
+const providerToCredentialKey: Record<string, string> = {
+  groq: 'providerApiKeyGroq',
+  openai: 'providerApiKeyOpenAI',
+  anthropic: 'providerApiKeyAnthropic',
+  google: 'providerApiKeyGemini',
+  openrouter: 'providerApiKeyOpenRouter',
+};
+
+// Fallback models when API call fails
+const fallbackModels: Record<string, INodePropertyOptions[]> = {
+  groq: [
+    { name: 'llama-3.3-70b-versatile', value: 'llama-3.3-70b-versatile' },
+    { name: 'llama-3.1-8b-instant', value: 'llama-3.1-8b-instant' },
+    { name: 'groq/compound', value: 'groq/compound' },
+    { name: 'groq/compound-mini', value: 'groq/compound-mini' },
+    { name: 'meta-llama/llama-4-maverick-17b-128e-instruct', value: 'meta-llama/llama-4-maverick-17b-128e-instruct' },
+    { name: 'qwen/qwen3-32b', value: 'qwen/qwen3-32b' },
+  ],
+  openai: [
+    { name: 'gpt-4o', value: 'gpt-4o' },
+    { name: 'gpt-4o-mini', value: 'gpt-4o-mini' },
+    { name: 'gpt-4-turbo', value: 'gpt-4-turbo' },
+    { name: 'gpt-4', value: 'gpt-4' },
+    { name: 'gpt-3.5-turbo', value: 'gpt-3.5-turbo' },
+  ],
+  anthropic: [
+    { name: 'claude-sonnet-4-20250514', value: 'claude-sonnet-4-20250514' },
+    { name: 'claude-3-5-sonnet-20241022', value: 'claude-3-5-sonnet-20241022' },
+    { name: 'claude-3-5-haiku-20241022', value: 'claude-3-5-haiku-20241022' },
+    { name: 'claude-3-opus-20240229', value: 'claude-3-opus-20240229' },
+  ],
+  google: [
+    { name: 'gemini-2.0-flash', value: 'gemini-2.0-flash' },
+    { name: 'gemini-1.5-pro', value: 'gemini-1.5-pro' },
+    { name: 'gemini-1.5-flash', value: 'gemini-1.5-flash' },
+  ],
+  openrouter: [
+    { name: 'openrouter/auto', value: 'openrouter/auto' },
+    { name: 'anthropic/claude-3.5-sonnet', value: 'anthropic/claude-3.5-sonnet' },
+    { name: 'google/gemini-pro-1.5', value: 'google/gemini-pro-1.5' },
+    { name: 'meta-llama/llama-3.1-70b-instruct', value: 'meta-llama/llama-3.1-70b-instruct' },
+  ],
+};
+
+// Default model per provider
+const defaultModels: Record<string, string> = {
+  groq: 'llama-3.3-70b-versatile',
+  openai: 'gpt-4o',
+  anthropic: 'claude-sonnet-4-20250514',
+  google: 'gemini-2.0-flash',
+  openrouter: 'openrouter/auto',
+};
 
 export class DemetericsChatModel implements INodeType {
   description: INodeTypeDescription = {
@@ -40,11 +104,13 @@ export class DemetericsChatModel implements INodeType {
       {
         displayName: 'Model',
         name: 'model',
-        type: 'string',
-        default: 'llama-3.3-70b-versatile',
-        placeholder: 'e.g., groq/compound, llama-3.3-70b-versatile',
-        description: 'The model ID to use. See provider documentation for available models.',
-        hint: 'Groq: groq/compound, llama-3.3-70b-versatile | OpenAI: gpt-4o, gpt-4-turbo | Anthropic: claude-sonnet-4',
+        type: 'options',
+        typeOptions: {
+          loadOptionsMethod: 'getModels',
+          loadOptionsDependsOn: ['provider'],
+        },
+        default: '',
+        description: 'The model to use for chat completion',
       },
       {
         displayName: 'Options',
@@ -64,6 +130,62 @@ export class DemetericsChatModel implements INodeType {
     ],
   };
 
+  methods = {
+    loadOptions: {
+      async getModels(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+        const provider = this.getCurrentNodeParameter('provider') as string;
+        const providerBase = providerBaseMap[provider] ?? provider;
+
+        try {
+          const credentials = await this.getCredentials('demetericsApi');
+          const demetericsKey = (credentials.apiKey as string) || '';
+          const byok = Boolean(credentials.byok);
+          const baseUrl = ((credentials.baseUrl as string) || 'https://api.demeterics.com').replace(/\/$/, '');
+
+          // Build API key (combine with vendor key if BYOK)
+          const vendorKeyField = providerToCredentialKey[provider];
+          const vendorKey = vendorKeyField ? ((credentials as Record<string, unknown>)[vendorKeyField] as string) || '' : '';
+          const apiKey = byok && vendorKey ? `${demetericsKey};${vendorKey}` : demetericsKey;
+
+          const response = await this.helpers.httpRequest({
+            method: 'GET',
+            url: `${baseUrl}/${providerBase}/v1/models`,
+            headers: {
+              'Authorization': `Bearer ${apiKey}`,
+            },
+            timeout: 10000,
+          });
+
+          const models: INodePropertyOptions[] = [];
+          const data = response?.data || response || [];
+
+          for (const model of data) {
+            const modelId = model.id || model.name || model;
+            if (typeof modelId === 'string') {
+              models.push({
+                name: modelId,
+                value: modelId,
+              });
+            }
+          }
+
+          // Sort models alphabetically
+          models.sort((a, b) => (a.name as string).localeCompare(b.name as string));
+
+          // If we got models, return them; otherwise fall back
+          if (models.length > 0) {
+            return models;
+          }
+        } catch {
+          // Fall through to fallback models
+        }
+
+        // Return fallback models for the provider
+        return fallbackModels[provider] || [{ name: defaultModels[provider] || 'default', value: defaultModels[provider] || 'default' }];
+      },
+    },
+  };
+
   async supplyData(this: ISupplyDataFunctions): Promise<SupplyData> {
     const credentials = await this.getCredentials('demetericsApi');
     const demetericsKey = (credentials.apiKey as string) || '';
@@ -81,24 +203,10 @@ export class DemetericsChatModel implements INodeType {
       timeout?: number;
     };
 
-    const providerBaseMap: Record<string, string> = {
-      groq: 'groq',
-      openai: 'openai',
-      anthropic: 'anthropic',
-      google: 'google',
-      openrouter: 'openrouter',
-    };
     const providerBase = providerBaseMap[provider] ?? 'openai';
 
-    const providerToCredentialKey: Record<string, string> = {
-      groq: 'providerApiKeyGroq',
-      openai: 'providerApiKeyOpenAI',
-      anthropic: 'providerApiKeyAnthropic',
-      google: 'providerApiKeyGemini',
-      openrouter: 'providerApiKeyOpenRouter',
-    };
     const vendorKeyField = providerToCredentialKey[provider];
-    const vendorKey = vendorKeyField ? ((credentials as any)[vendorKeyField] as string) || '' : '';
+    const vendorKey = vendorKeyField ? ((credentials as Record<string, unknown>)[vendorKeyField] as string) || '' : '';
     const apiKey = byok && vendorKey ? `${demetericsKey};${vendorKey}` : demetericsKey;
 
     const chatModel = new ChatOpenAI({
@@ -118,4 +226,3 @@ export class DemetericsChatModel implements INodeType {
     return { response: chatModel };
   }
 }
-
