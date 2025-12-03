@@ -334,7 +334,7 @@ export class DemetericsChat implements INodeType {
         url = `${baseUrl}/${providerBase}/v1/chat/completions`;
       }
 
-      const requestOptions = {
+      const response = await this.helpers.httpRequest({
         method: 'POST',
         url,
         headers: {
@@ -342,11 +342,8 @@ export class DemetericsChat implements INodeType {
           'Content-Type': 'application/json',
         },
         body,
-        json: true,
         timeout: (options.timeout ?? 60) * 1000,
-      } as const;
-
-      const response = await this.helpers.request(requestOptions);
+      });
 
       // Extract the response content for easier downstream use
       let content = '';

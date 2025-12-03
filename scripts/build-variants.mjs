@@ -111,12 +111,13 @@ function writeVariant(variant, name, isLite = false) {
   const outputPath = path.join(stagingDir, 'package.json');
   fs.writeFileSync(outputPath, JSON.stringify(variant, null, 2) + '\n');
 
-  // Copy dist folder
+  // Copy dist folder (exclude ChatModel for lite version)
   const srcDist = path.join(rootDir, 'dist');
   const destDist = path.join(stagingDir, 'dist');
+  const excludeDirs = isLite ? ['DemetericsChatModel'] : [];
 
   if (fs.existsSync(srcDist)) {
-    copyDirSync(srcDist, destDist);
+    copyDirSync(srcDist, destDist, excludeDirs);
   }
 
   // Copy LICENSE
@@ -155,9 +156,9 @@ function writeVariant(variant, name, isLite = false) {
 }
 
 /**
- * Recursively copy a directory
+ * Recursively copy a directory, with optional exclusions
  */
-function copyDirSync(src, dest) {
+function copyDirSync(src, dest, excludeDirs = []) {
   fs.mkdirSync(dest, { recursive: true });
   const entries = fs.readdirSync(src, { withFileTypes: true });
 
@@ -166,7 +167,11 @@ function copyDirSync(src, dest) {
     const destPath = path.join(dest, entry.name);
 
     if (entry.isDirectory()) {
-      copyDirSync(srcPath, destPath);
+      // Skip excluded directories
+      if (excludeDirs.includes(entry.name)) {
+        continue;
+      }
+      copyDirSync(srcPath, destPath, excludeDirs);
     } else {
       fs.copyFileSync(srcPath, destPath);
     }
