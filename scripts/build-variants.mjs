@@ -37,6 +37,22 @@ const LANGCHAIN_KEYWORDS = [
 ];
 
 /**
+ * Clean package.json for distribution (remove dev-only scripts and deps)
+ */
+function cleanForDistribution(pkg) {
+  // Remove scripts that reference source files (not present in dist)
+  delete pkg.scripts;
+
+  // Remove dev dependencies (not needed for published package)
+  delete pkg.devDependencies;
+
+  // Remove packageManager (not needed for consumers)
+  delete pkg.packageManager;
+
+  return pkg;
+}
+
+/**
  * Generate the lite package.json (n8n Cloud compatible, no LangChain)
  */
 function generateLitePackage() {
@@ -69,15 +85,17 @@ function generateLitePackage() {
     }
   }
 
-  return lite;
+  // Clean for distribution
+  return cleanForDistribution(lite);
 }
 
 /**
  * Generate the full package.json (self-hosted, includes LangChain)
  */
 function generateFullPackage() {
-  // Full package is the original package.json as-is
-  return JSON.parse(JSON.stringify(packageJson));
+  const full = JSON.parse(JSON.stringify(packageJson));
+  // Clean for distribution
+  return cleanForDistribution(full);
 }
 
 /**
