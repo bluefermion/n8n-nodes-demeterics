@@ -257,22 +257,21 @@ export class DemetericsSpeech implements INodeType {
         }
 
         // Make request to Demeterics TTS API
-        const response = await this.helpers.request({
+        const response = await this.helpers.httpRequest({
           method: 'POST',
           url: `${baseUrl}/tts/v1/generate`,
           headers: {
             'Authorization': authHeader,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
+          body: {
             provider,
             model,
             voice,
             input: text,
             format,
             speed,
-          }),
-          json: true,
+          },
         });
 
         returnData.push({

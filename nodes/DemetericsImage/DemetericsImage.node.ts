@@ -305,15 +305,14 @@ export class DemetericsImage implements INodeType {
         }
 
         // Make request to Demeterics Imagen API
-        const response = await this.helpers.request({
+        const response = await this.helpers.httpRequest({
           method: 'POST',
           url: `${baseUrl}/imagen/v1/generate`,
           headers: {
             'Authorization': authHeader,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(body),
-          json: true,
+          body,
         });
 
         // Return each image as a separate item if multiple
