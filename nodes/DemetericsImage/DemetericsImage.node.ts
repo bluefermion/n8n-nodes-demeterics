@@ -312,13 +312,13 @@ export class DemetericsImage implements INodeType {
             // If API returned URL and we want binary, fetch the image
             else if (image.url) {
               try {
-                const imageResponse = await this.helpers.httpRequest({
+                // Don't use returnFullResponse to avoid circular reference issues
+                const imageBuffer = await this.helpers.httpRequest({
                   method: 'GET',
                   url: image.url,
                   encoding: 'arraybuffer',
-                  returnFullResponse: true,
-                });
-                binaryData = Buffer.from(imageResponse.body as ArrayBuffer);
+                }) as ArrayBuffer;
+                binaryData = Buffer.from(imageBuffer);
               } catch {
                 // If fetch fails, just include URL
                 (imageData.json as Record<string, unknown>).image_url = image.url;

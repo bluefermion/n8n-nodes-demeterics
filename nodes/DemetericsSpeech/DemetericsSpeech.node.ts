@@ -408,13 +408,13 @@ export class DemetericsSpeech implements INodeType {
           // If API returned URL and we want binary, fetch the audio
           else if (response.audio_url) {
             try {
-              const audioResponse = await this.helpers.httpRequest({
+              // Don't use returnFullResponse to avoid circular reference issues
+              const audioBuffer = await this.helpers.httpRequest({
                 method: 'GET',
                 url: response.audio_url,
                 encoding: 'arraybuffer',
-                returnFullResponse: true,
-              });
-              binaryData = Buffer.from(audioResponse.body as ArrayBuffer);
+              }) as ArrayBuffer;
+              binaryData = Buffer.from(audioBuffer);
             } catch {
               // If fetch fails, include URL and error
               (audioData.json as Record<string, unknown>).audio_url = response.audio_url;

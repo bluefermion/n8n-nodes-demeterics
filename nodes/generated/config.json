@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2025-12-04T19:38:49Z",
+  "updated_at": "2025-12-04T19:57:11Z",
   "tts": {
     "providers": [
       {
@@ -610,12 +610,8 @@
                 "label": "1024x1536 (2:3 Portrait)"
               },
               {
-                "value": "1792x1024",
-                "label": "1792x1024 (16:9 Wide)"
-              },
-              {
-                "value": "1024x1792",
-                "label": "1024x1792 (9:16 Tall)"
+                "value": "auto",
+                "label": "Auto (Let AI choose)"
               }
             ]
           },
@@ -674,13 +670,18 @@
             "display_name": "Model",
             "type": "options",
             "required": true,
-            "default": "imagen-3.0-generate-002",
+            "default": "imagen-4.0-generate-001",
             "options": [
+              {
+                "value": "imagen-4.0-generate-001",
+                "label": "Imagen 4.0 (Latest)",
+                "description": "Latest generation model",
+                "default": true
+              },
               {
                 "value": "imagen-3.0-generate-002",
                 "label": "Imagen 3.0 Generate",
-                "description": "Latest generation model",
-                "default": true
+                "description": "Previous generation model"
               },
               {
                 "value": "imagen-3.0-fast-generate-001",

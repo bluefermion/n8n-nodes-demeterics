@@ -1,8 +1,8 @@
 /**
  * Auto-generated configuration from Demeterics API
- * Generated: 2025-12-04T19:38:50.003Z
+ * Generated: 2025-12-04T19:57:11.512Z
  * API Version: 1.0
- * API Updated: 2025-12-04T19:38:49Z
+ * API Updated: 2025-12-04T19:57:11Z
  * 
  * DO NOT EDIT MANUALLY - Run "npm run fetch-config" to regenerate
  * 
@@ -395,8 +395,7 @@ export const imageProperties: INodeProperties[] = [
       { name: '1024x1024 (1:1 Square)', value: '1024x1024' },
       { name: '1536x1024 (3:2 Landscape)', value: '1536x1024' },
       { name: '1024x1536 (2:3 Portrait)', value: '1024x1536' },
-      { name: '1792x1024 (16:9 Wide)', value: '1792x1024' },
-      { name: '1024x1792 (9:16 Tall)', value: '1024x1792' },
+      { name: 'Auto (Let AI choose)', value: 'auto' },
     ],
     displayOptions: { show: { provider: ['openai'] } },
   },
@@ -436,10 +435,11 @@ export const imageProperties: INodeProperties[] = [
     displayName: 'Model',
     name: 'model',
     type: 'options',
-    default: 'imagen-3.0-generate-002',
+    default: 'imagen-4.0-generate-001',
     required: true,
     options: [
-      { name: 'Imagen 3.0 Generate', value: 'imagen-3.0-generate-002', description: 'Latest generation model' },
+      { name: 'Imagen 4.0 (Latest)', value: 'imagen-4.0-generate-001', description: 'Latest generation model' },
+      { name: 'Imagen 3.0 Generate', value: 'imagen-3.0-generate-002', description: 'Previous generation model' },
       { name: 'Imagen 3.0 Fast', value: 'imagen-3.0-fast-generate-001', description: 'Faster generation, slightly lower quality' },
     ],
     displayOptions: { show: { provider: ['google'] } },
@@ -568,7 +568,7 @@ export const imageProperties: INodeProperties[] = [
 
 export const imageDefaultModels: Record<string, string> = {
   openai: 'gpt-image-1',
-  google: 'imagen-3.0-generate-002',
+  google: 'imagen-4.0-generate-001',
   stability: 'core',
 };
 
@@ -735,7 +735,8 @@ export const imageModelOptions: Record<string, INodePropertyOptions[]> = {
     { name: 'GPT Image 1 Mini (~70% cheaper)', value: 'gpt-image-1-mini' },
   ],
   google: [
-    { name: 'Imagen 3.0 Generate', value: 'imagen-3.0-generate-002', description: 'Default' },
+    { name: 'Imagen 4.0 (Latest)', value: 'imagen-4.0-generate-001', description: 'Default' },
+    { name: 'Imagen 3.0 Generate', value: 'imagen-3.0-generate-002' },
     { name: 'Imagen 3.0 Fast', value: 'imagen-3.0-fast-generate-001' },
   ],
   stability: [
@@ -751,8 +752,7 @@ export const imageSizeOptions: Record<string, INodePropertyOptions[]> = {
     { name: '1024x1024 (1:1 Square)', value: '1024x1024' },
     { name: '1536x1024 (3:2 Landscape)', value: '1536x1024' },
     { name: '1024x1536 (2:3 Portrait)', value: '1024x1536' },
-    { name: '1792x1024 (16:9 Wide)', value: '1792x1024' },
-    { name: '1024x1792 (9:16 Tall)', value: '1024x1792' },
+    { name: 'Auto (Let AI choose)', value: 'auto' },
   ],
   google: [
     { name: '1024x1024 (1:1 Square)', value: '1024x1024' },
@@ -787,4 +787,4 @@ export const imageStyleOptions: Record<string, INodePropertyOptions[]> = {
 
 // Configuration metadata
 export const configVersion = '1.0';
-export const configUpdatedAt = '2025-12-04T19:38:49Z';
+export const configUpdatedAt = '2025-12-04T19:57:11Z';
