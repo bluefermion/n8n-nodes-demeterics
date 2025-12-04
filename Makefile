@@ -1,4 +1,4 @@
-.PHONY: install build dev lint lintfix format clean check publish help pack install-local uninstall-local install-custom uninstall-custom cli-build cli-install prepare verify version bump package package-lite package-full wait-publish wait-publish-pkg build-variants
+.PHONY: install build dev lint lintfix format clean check publish help pack install-local uninstall-local install-custom uninstall-custom cli-build cli-install prepare verify version bump package package-lite package-full wait-publish wait-publish-pkg build-variants fetch-config
 
 # Default n8n user folder (override with: make install-custom DIR=/your/path)
 DIR ?= /opt/n8n/n8n_data
@@ -10,9 +10,17 @@ PM := $(shell command -v pnpm >/dev/null 2>&1 && echo pnpm || echo npm)
 install:
 	$(PM) install
 
+# Fetch configuration from Demeterics API and generate TypeScript
+# Usage: make fetch-config [URL=http://localhost:8080]
+URL ?= https://api.demeterics.com
+fetch-config:
+	@echo "Fetching configuration from $(URL)..."
+	$(PM) run fetch-config -- --url $(URL)
+
 # Prefer the official n8n-node CLI when available
 # Falls back to the existing TypeScript + gulp build
-build: cli-build
+# NOTE: fetch-config runs first to ensure generated config is up-to-date
+build: fetch-config cli-build
 
 # Use n8n-node CLI if present, otherwise try via npx, else fallback
 cli-build:
@@ -278,7 +286,8 @@ help:
 	@echo ""
 	@echo "Usage:"
 	@echo "  make install       - Install dependencies"
-	@echo "  make build         - Build the package (prefers n8n-node CLI)"
+	@echo "  make fetch-config  - Fetch config from API (URL=https://api.demeterics.com)"
+	@echo "  make build         - Fetch config + build the package"
 	@echo "  make build-variants- Build both lite and full package variants"
 	@echo "  make dev           - Watch mode for development"
 	@echo "  make lint          - Run linter"
