@@ -53,6 +53,10 @@ interface ImageProvider {
   max_prompt_len: number;
   max_images: number;
   supports_negative_prompt: boolean;
+  supports_quality: boolean;
+  supports_style: boolean;
+  quality_options?: ParameterOption[];
+  style_options?: ParameterOption[];
 }
 
 interface ParameterOption {
@@ -230,30 +234,42 @@ function generateTypeScript(config: ServiceConfig): string {
   lines.push('};');
   lines.push('');
 
-  // Provider features
-  lines.push('export const imageProviderFeatures: Record<string, { supportsNegativePrompt: boolean; maxImages: number; maxPromptLen: number }> = {');
+  // Provider features (includes all capability flags)
+  lines.push('export const imageProviderFeatures: Record<string, { supportsNegativePrompt: boolean; supportsQuality: boolean; supportsStyle: boolean; maxImages: number; maxPromptLen: number }> = {');
   for (const provider of config.image.providers) {
-    lines.push(`  ${provider.id}: { supportsNegativePrompt: ${provider.supports_negative_prompt}, maxImages: ${provider.max_images}, maxPromptLen: ${provider.max_prompt_len} },`);
+    lines.push(`  ${provider.id}: { supportsNegativePrompt: ${provider.supports_negative_prompt}, supportsQuality: ${provider.supports_quality}, supportsStyle: ${provider.supports_style}, maxImages: ${provider.max_images}, maxPromptLen: ${provider.max_prompt_len} },`);
   }
   lines.push('};');
   lines.push('');
 
-  // Quality options (from parameters)
-  lines.push('export const imageQualityOptions: INodePropertyOptions[] = [');
-  for (const opt of config.image.parameters.quality) {
-    const defaultStr = opt.default ? ', description: "Default"' : '';
-    lines.push(`  { name: '${escapeString(opt.display_name)}', value: '${opt.value}'${defaultStr} },`);
+  // Quality options per provider (only for providers that support it)
+  lines.push('export const imageQualityOptions: Record<string, INodePropertyOptions[]> = {');
+  for (const provider of config.image.providers) {
+    if (provider.supports_quality && provider.quality_options) {
+      lines.push(`  ${provider.id}: [`);
+      for (const opt of provider.quality_options) {
+        const defaultStr = opt.default ? ', description: "Default"' : '';
+        lines.push(`    { name: '${escapeString(opt.display_name)}', value: '${opt.value}'${defaultStr} },`);
+      }
+      lines.push('  ],');
+    }
   }
-  lines.push('];');
+  lines.push('};');
   lines.push('');
 
-  // Style options (from parameters)
-  lines.push('export const imageStyleOptions: INodePropertyOptions[] = [');
-  for (const opt of config.image.parameters.style) {
-    const defaultStr = opt.default ? ', description: "Default"' : '';
-    lines.push(`  { name: '${escapeString(opt.display_name)}', value: '${opt.value}'${defaultStr} },`);
+  // Style options per provider (only for providers that support it)
+  lines.push('export const imageStyleOptions: Record<string, INodePropertyOptions[]> = {');
+  for (const provider of config.image.providers) {
+    if (provider.supports_style && provider.style_options) {
+      lines.push(`  ${provider.id}: [`);
+      for (const opt of provider.style_options) {
+        const defaultStr = opt.default ? ', description: "Default"' : '';
+        lines.push(`    { name: '${escapeString(opt.display_name)}', value: '${opt.value}'${defaultStr} },`);
+      }
+      lines.push('  ],');
+    }
   }
-  lines.push('];');
+  lines.push('};');
   lines.push('');
 
   // Parameter ranges

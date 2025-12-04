@@ -69,22 +69,23 @@ export const imageDefaultModels: Record<string, string> = {
   stability: 'core',
 };
 
-export const imageProviderFeatures: Record<string, { supportsNegativePrompt: boolean; maxImages: number; maxPromptLen: number }> = {
-  openai: { supportsNegativePrompt: false, maxImages: 4, maxPromptLen: 4000 },
-  google: { supportsNegativePrompt: true, maxImages: 4, maxPromptLen: 5000 },
-  stability: { supportsNegativePrompt: true, maxImages: 4, maxPromptLen: 10000 },
+export const imageProviderFeatures: Record<string, { supportsNegativePrompt: boolean; supportsQuality: boolean; supportsStyle: boolean; maxImages: number; maxPromptLen: number }> = {
+  openai: { supportsNegativePrompt: false, supportsQuality: true, supportsStyle: false, maxImages: 4, maxPromptLen: 4000 },
+  google: { supportsNegativePrompt: true, supportsQuality: false, supportsStyle: false, maxImages: 4, maxPromptLen: 5000 },
+  stability: { supportsNegativePrompt: true, supportsQuality: false, supportsStyle: false, maxImages: 4, maxPromptLen: 10000 },
 };
 
-export const imageQualityOptions: INodePropertyOptions[] = [
-  { name: 'Low (Fastest)', value: 'low' },
-  { name: 'Medium (Balanced)', value: 'medium', description: 'Default' },
-  { name: 'High (Best Quality)', value: 'high' },
-];
+export const imageQualityOptions: Record<string, INodePropertyOptions[]> = {
+  openai: [
+    { name: 'Low (Fastest)', value: 'low' },
+    { name: 'Medium (Balanced)', value: 'medium', description: 'Default' },
+    { name: 'High (Best Quality)', value: 'high' },
+  ],
+};
 
-export const imageStyleOptions: INodePropertyOptions[] = [
-  { name: 'Natural', value: 'natural', description: 'Default' },
-  { name: 'Vivid', value: 'vivid' },
-];
+export const imageStyleOptions: Record<string, INodePropertyOptions[]> = {
+  // No providers currently support style (was DALL-E 3 only, gpt-image-1 doesn't support it)
+};
 
 export const imageNRange = { min: 1, max: 4, default: 1 };
 export const imageSeedRange = { min: 0, max: 4294967295, default: 0 };

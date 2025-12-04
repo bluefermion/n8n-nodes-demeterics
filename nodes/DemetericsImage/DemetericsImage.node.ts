@@ -11,8 +11,8 @@ import {
   imageModelOptions,
   imageSizeOptions,
   imageDefaultModels,
+  imageProviderFeatures,
   imageQualityOptions,
-  imageStyleOptions,
   imageNRange,
 } from '../generated/config';
 
@@ -161,26 +161,13 @@ export class DemetericsImage implements INodeType {
         name: 'quality',
         type: 'options',
         default: 'medium',
-        options: imageQualityOptions,
+        options: imageQualityOptions.openai || [],
         displayOptions: {
           show: {
             provider: ['openai'],
           },
         },
-        description: 'Image quality (OpenAI only)',
-      },
-      {
-        displayName: 'Style',
-        name: 'style',
-        type: 'options',
-        default: 'natural',
-        options: imageStyleOptions,
-        displayOptions: {
-          show: {
-            provider: ['openai'],
-          },
-        },
-        description: 'Image style (OpenAI only)',
+        description: 'Image quality (OpenAI gpt-image-1 only)',
       },
       {
         displayName: 'Number of Images',
@@ -235,12 +222,11 @@ export class DemetericsImage implements INodeType {
         const seed = this.getNodeParameter('seed', i) as number;
         const outputType = this.getNodeParameter('outputType', i, 'binary') as string;
 
-        // Get provider-specific options
+        // Get provider-specific options based on feature flags
+        const features = imageProviderFeatures[provider];
         let quality = 'medium';
-        let style = 'natural';
-        if (provider === 'openai') {
+        if (features?.supportsQuality) {
           quality = this.getNodeParameter('quality', i) as string;
-          style = this.getNodeParameter('style', i) as string;
         }
 
         // Build Authorization header with BYOK support
@@ -264,12 +250,11 @@ export class DemetericsImage implements INodeType {
           n,
         };
 
-        if (negativePrompt) {
+        if (negativePrompt && features?.supportsNegativePrompt) {
           body.negative_prompt = negativePrompt;
         }
-        if (provider === 'openai') {
+        if (features?.supportsQuality) {
           body.quality = quality;
-          body.style = style;
         }
         if (seed > 0) {
           body.seed = seed;
