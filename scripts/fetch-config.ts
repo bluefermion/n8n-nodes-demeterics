@@ -96,13 +96,21 @@ interface TTSModel {
   price_per_char: number;
 }
 
+interface FormatOption {
+  value: string;
+  display_name: string;
+}
+
 interface TTSProvider {
   id: string;
   display_name: string;
   models: TTSModel[];
   voices: Voice[];
-  formats: string[];
+  formats: FormatOption[];
   max_chars: number;
+  supports_speed: boolean;
+  supports_language: boolean;
+  supports_instructions: boolean;
 }
 
 interface ParameterRangeFloat {
@@ -322,7 +330,7 @@ function generateTypeScript(config: ServiceConfig): string {
   for (const provider of config.tts.providers) {
     lines.push(`  ${provider.id}: [`);
     for (const format of provider.formats) {
-      lines.push(`    { name: '${format}', value: '${format.toLowerCase()}' },`);
+      lines.push(`    { name: '${escapeString(format.display_name)}', value: '${format.value}' },`);
     }
     lines.push('  ],');
   }
@@ -352,9 +360,9 @@ function generateTypeScript(config: ServiceConfig): string {
   lines.push('');
 
   // Provider features
-  lines.push('export const ttsProviderFeatures: Record<string, { maxChars: number }> = {');
+  lines.push('export const ttsProviderFeatures: Record<string, { maxChars: number; supportsSpeed: boolean; supportsLanguage: boolean; supportsInstructions: boolean }> = {');
   for (const provider of config.tts.providers) {
-    lines.push(`  ${provider.id}: { maxChars: ${provider.max_chars} },`);
+    lines.push(`  ${provider.id}: { maxChars: ${provider.max_chars}, supportsSpeed: ${provider.supports_speed}, supportsLanguage: ${provider.supports_language}, supportsInstructions: ${provider.supports_instructions} },`);
   }
   lines.push('};');
   lines.push('');

@@ -10,8 +10,10 @@ import {
   ttsProviderOptions,
   ttsModelOptions,
   ttsVoiceOptions,
+  ttsFormatOptions,
   ttsDefaultModels,
   ttsDefaultVoices,
+  ttsProviderFeatures,
   ttsSpeedRange,
 } from '../generated/config';
 
@@ -174,22 +176,60 @@ export class DemetericsSpeech implements INodeType {
         },
         description: 'Text to convert to speech (max varies by provider: OpenAI 4096, ElevenLabs 5000, Google 5000, Murf 10000)',
       },
+      // Format options per provider
       {
         displayName: 'Output Format',
         name: 'format',
         type: 'options',
         default: 'mp3',
-        options: [
-          { name: 'MP3', value: 'mp3' },
-          { name: 'WAV', value: 'wav' },
-          { name: 'Opus', value: 'opus' },
-          { name: 'FLAC', value: 'flac' },
-          { name: 'AAC', value: 'aac' },
-          { name: 'OGG', value: 'ogg' },
-          { name: 'PCM', value: 'pcm' },
-        ],
-        description: 'Audio output format (availability varies by provider)',
+        options: ttsFormatOptions.openai || [],
+        displayOptions: {
+          show: {
+            provider: ['openai'],
+          },
+        },
+        description: 'Audio output format',
       },
+      {
+        displayName: 'Output Format',
+        name: 'format',
+        type: 'options',
+        default: 'mp3_44100_128',
+        options: ttsFormatOptions.elevenlabs || [],
+        displayOptions: {
+          show: {
+            provider: ['elevenlabs'],
+          },
+        },
+        description: 'Audio output format',
+      },
+      {
+        displayName: 'Output Format',
+        name: 'format',
+        type: 'options',
+        default: 'mp3',
+        options: ttsFormatOptions.google || [],
+        displayOptions: {
+          show: {
+            provider: ['google'],
+          },
+        },
+        description: 'Audio output format',
+      },
+      {
+        displayName: 'Output Format',
+        name: 'format',
+        type: 'options',
+        default: 'mp3',
+        options: ttsFormatOptions.murf || [],
+        displayOptions: {
+          show: {
+            provider: ['murf'],
+          },
+        },
+        description: 'Audio output format',
+      },
+      // Speed - only for providers that support it (not ElevenLabs)
       {
         displayName: 'Speed',
         name: 'speed',
@@ -200,14 +240,41 @@ export class DemetericsSpeech implements INodeType {
           maxValue: ttsSpeedRange.max,
           numberStepSize: 0.1,
         },
+        displayOptions: {
+          show: {
+            provider: ['openai', 'google', 'murf'],
+          },
+        },
         description: `Playback speed (${ttsSpeedRange.min} to ${ttsSpeedRange.max})`,
       },
+      // Instructions - only for OpenAI gpt-4o-mini-tts
+      {
+        displayName: 'Voice Instructions',
+        name: 'instructions',
+        type: 'string',
+        default: '',
+        typeOptions: {
+          rows: 3,
+        },
+        displayOptions: {
+          show: {
+            provider: ['openai'],
+          },
+        },
+        description: 'Optional voice style instructions (gpt-4o-mini-tts only). E.g., "Speak in a warm, friendly tone" or "Read as a news anchor"',
+      },
+      // Language - only for Murf
       {
         displayName: 'Language',
         name: 'language',
         type: 'string',
         default: '',
         placeholder: 'e.g., en, es, fr, de',
+        displayOptions: {
+          show: {
+            provider: ['murf'],
+          },
+        },
         description: 'Language code (ISO 639-1). Leave empty for auto-detection or use voice locale.',
       },
       {
@@ -241,9 +308,26 @@ export class DemetericsSpeech implements INodeType {
         const voice = this.getNodeParameter('voice', i) as string;
         const text = this.getNodeParameter('text', i) as string;
         const format = this.getNodeParameter('format', i) as string;
-        const speed = this.getNodeParameter('speed', i) as number;
-        const language = this.getNodeParameter('language', i, '') as string;
         const outputType = this.getNodeParameter('outputType', i, 'binary') as string;
+
+        // Get provider-specific features
+        const features = ttsProviderFeatures[provider];
+
+        // Get optional parameters based on provider support
+        let speed = ttsSpeedRange.default;
+        if (features?.supportsSpeed) {
+          speed = this.getNodeParameter('speed', i) as number;
+        }
+
+        let language = '';
+        if (features?.supportsLanguage) {
+          language = this.getNodeParameter('language', i, '') as string;
+        }
+
+        let instructions = '';
+        if (features?.supportsInstructions) {
+          instructions = this.getNodeParameter('instructions', i, '') as string;
+        }
 
         // Build Authorization header with BYOK support
         let authHeader = `Bearer ${demetericsApiKey}`;
@@ -264,11 +348,19 @@ export class DemetericsSpeech implements INodeType {
           voice,
           input: text,
           format,
-          speed,
         };
 
-        if (language) {
+        // Only include parameters if the provider supports them
+        if (features?.supportsSpeed) {
+          body.speed = speed;
+        }
+
+        if (language && features?.supportsLanguage) {
           body.language = language;
+        }
+
+        if (instructions && features?.supportsInstructions) {
+          body.instructions = instructions;
         }
 
         // Make request to Demeterics TTS API

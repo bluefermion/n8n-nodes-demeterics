@@ -170,25 +170,25 @@ export const ttsVoiceOptions: Record<string, INodePropertyOptions[]> = {
 
 export const ttsFormatOptions: Record<string, INodePropertyOptions[]> = {
   openai: [
-    { name: 'mp3', value: 'mp3' },
-    { name: 'opus', value: 'opus' },
-    { name: 'aac', value: 'aac' },
-    { name: 'flac', value: 'flac' },
-    { name: 'wav', value: 'wav' },
-    { name: 'pcm', value: 'pcm' },
+    { name: 'MP3', value: 'mp3' },
+    { name: 'Opus', value: 'opus' },
+    { name: 'AAC', value: 'aac' },
+    { name: 'FLAC', value: 'flac' },
+    { name: 'WAV', value: 'wav' },
+    { name: 'PCM', value: 'pcm' },
   ],
   elevenlabs: [
-    { name: 'mp3_44100_128', value: 'mp3_44100_128' },
-    { name: 'mp3_44100_192', value: 'mp3_44100_192' },
-    { name: 'pcm_16000', value: 'pcm_16000' },
-    { name: 'pcm_22050', value: 'pcm_22050' },
-    { name: 'pcm_24000', value: 'pcm_24000' },
-    { name: 'pcm_44100', value: 'pcm_44100' },
+    { name: 'MP3 (44.1kHz, 128kbps)', value: 'mp3_44100_128' },
+    { name: 'MP3 (44.1kHz, 192kbps)', value: 'mp3_44100_192' },
+    { name: 'PCM (16kHz)', value: 'pcm_16000' },
+    { name: 'PCM (22.05kHz)', value: 'pcm_22050' },
+    { name: 'PCM (24kHz)', value: 'pcm_24000' },
+    { name: 'PCM (44.1kHz)', value: 'pcm_44100' },
   ],
   google: [
     { name: 'MP3', value: 'mp3' },
-    { name: 'LINEAR16', value: 'linear16' },
-    { name: 'OGG_OPUS', value: 'ogg_opus' },
+    { name: 'WAV (LINEAR16)', value: 'linear16' },
+    { name: 'OGG Opus', value: 'ogg_opus' },
     { name: 'MULAW', value: 'mulaw' },
     { name: 'ALAW', value: 'alaw' },
   ],
@@ -217,11 +217,11 @@ export const ttsDefaultVoices: Record<string, string> = {
   murf: 'en-US-natalie',
 };
 
-export const ttsProviderFeatures: Record<string, { maxChars: number }> = {
-  openai: { maxChars: 4096 },
-  elevenlabs: { maxChars: 5000 },
-  google: { maxChars: 5000 },
-  murf: { maxChars: 10000 },
+export const ttsProviderFeatures: Record<string, { maxChars: number; supportsSpeed: boolean; supportsLanguage: boolean; supportsInstructions: boolean }> = {
+  openai: { maxChars: 4096, supportsSpeed: true, supportsLanguage: false, supportsInstructions: true },
+  elevenlabs: { maxChars: 5000, supportsSpeed: false, supportsLanguage: false, supportsInstructions: false },
+  google: { maxChars: 5000, supportsSpeed: true, supportsLanguage: false, supportsInstructions: false },
+  murf: { maxChars: 10000, supportsSpeed: true, supportsLanguage: true, supportsInstructions: false },
 };
 
 export const ttsSpeedRange = { min: 0.25, max: 4, default: 1 };
