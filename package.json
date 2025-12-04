@@ -54,7 +54,9 @@
     "lint": "eslint \"nodes/**/*.ts\" \"credentials/**/*.ts\"",
     "lintfix": "eslint \"nodes/**/*.ts\" \"credentials/**/*.ts\" --fix",
     "prepublishOnly": "pnpm test",
-    "release": "pnpm run build && pnpm publish --access public"
+    "release": "pnpm run build && pnpm publish --access public",
+    "fetch-config": "npx ts-node scripts/fetch-config.ts",
+    "fetch-config:local": "npx ts-node scripts/fetch-config.ts --url http://localhost:8080"
   },
   "files": [
     "dist"
@@ -81,6 +83,7 @@
     "gulp": "^5.0.0",
     "n8n-workflow": "^1.120.0",
     "prettier": "^3.0.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.5.0"
   },
   "peerDependencies": {

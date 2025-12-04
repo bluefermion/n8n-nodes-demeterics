@@ -3,16 +3,17 @@ import type {
   INodeExecutionData,
   INodeType,
   INodeTypeDescription,
-  INodePropertyOptions,
 } from 'n8n-workflow';
 
-// Provider options for the dropdown.
-const providerOptions: INodePropertyOptions[] = [
-  { name: 'OpenAI', value: 'openai' },
-  { name: 'ElevenLabs', value: 'elevenlabs' },
-  { name: 'Google Cloud TTS', value: 'google' },
-  { name: 'Murf.ai', value: 'murf' },
-];
+// Import configuration from generated config (fetched from API)
+import {
+  ttsProviderOptions,
+  ttsModelOptions,
+  ttsVoiceOptions,
+  ttsDefaultModels,
+  ttsDefaultVoices,
+  ttsSpeedRange,
+} from '../generated/config';
 
 // Map provider to credential field names for BYOK.
 const providerToCredentialKey: Record<string, string> = {
@@ -20,85 +21,6 @@ const providerToCredentialKey: Record<string, string> = {
   elevenlabs: 'providerApiKeyElevenLabs',
   google: 'providerApiKeyGemini',
   murf: 'providerApiKeyMurf',
-};
-
-// Voice options per provider
-const voiceOptions: Record<string, INodePropertyOptions[]> = {
-  openai: [
-    { name: 'Alloy - Neutral and balanced', value: 'alloy' },
-    { name: 'Ash - Warm and conversational', value: 'ash' },
-    { name: 'Ballad - Soft and melodic', value: 'ballad' },
-    { name: 'Coral - Friendly and approachable', value: 'coral' },
-    { name: 'Echo - Clear and articulate', value: 'echo' },
-    { name: 'Fable - Expressive and dynamic', value: 'fable' },
-    { name: 'Nova - Friendly and warm', value: 'nova' },
-    { name: 'Onyx - Deep and authoritative', value: 'onyx' },
-    { name: 'Sage - Calm and measured', value: 'sage' },
-    { name: 'Shimmer - Bright and optimistic', value: 'shimmer' },
-    { name: 'Verse - Dynamic and engaging', value: 'verse' },
-  ],
-  elevenlabs: [
-    { name: 'Rachel', value: 'rachel' },
-    { name: 'Drew', value: 'drew' },
-    { name: 'Clyde', value: 'clyde' },
-    { name: 'Paul', value: 'paul' },
-    { name: 'Domi', value: 'domi' },
-    { name: 'Dave', value: 'dave' },
-    { name: 'Fin', value: 'fin' },
-    { name: 'Sarah', value: 'sarah' },
-    { name: 'Antoni', value: 'antoni' },
-    { name: 'Thomas', value: 'thomas' },
-  ],
-  google: [
-    { name: 'en-US-Standard-A', value: 'en-US-Standard-A' },
-    { name: 'en-US-Standard-B', value: 'en-US-Standard-B' },
-    { name: 'en-US-Standard-C', value: 'en-US-Standard-C' },
-    { name: 'en-US-Standard-D', value: 'en-US-Standard-D' },
-    { name: 'en-US-Wavenet-A', value: 'en-US-Wavenet-A' },
-    { name: 'en-US-Wavenet-B', value: 'en-US-Wavenet-B' },
-    { name: 'en-US-Wavenet-C', value: 'en-US-Wavenet-C' },
-    { name: 'en-US-Wavenet-D', value: 'en-US-Wavenet-D' },
-    { name: 'en-US-Neural2-A', value: 'en-US-Neural2-A' },
-    { name: 'en-US-Neural2-C', value: 'en-US-Neural2-C' },
-    { name: 'en-US-Journey-D', value: 'en-US-Journey-D' },
-    { name: 'en-US-Studio-M', value: 'en-US-Studio-M' },
-    { name: 'en-US-Studio-O', value: 'en-US-Studio-O' },
-  ],
-  murf: [
-    { name: 'Natalie (US English, Female)', value: 'en-US-natalie' },
-    { name: 'Miles (US English, Male)', value: 'en-US-miles' },
-    { name: 'Julia (US English, Female)', value: 'en-US-julia' },
-    { name: 'Iris (UK English, Female)', value: 'en-UK-iris' },
-    { name: 'Elena (Spanish, Female)', value: 'es-ES-elena' },
-    { name: 'Claire (French, Female)', value: 'fr-FR-claire' },
-    { name: 'Anna (German, Female)', value: 'de-DE-anna' },
-  ],
-};
-
-// Model options per provider
-const modelOptions: Record<string, INodePropertyOptions[]> = {
-  openai: [
-    { name: 'GPT-4o Mini TTS (Latest, ~85% cheaper)', value: 'gpt-4o-mini-tts' },
-    { name: 'TTS-1 (Fast, legacy)', value: 'tts-1' },
-    { name: 'TTS-1-HD (High Quality, legacy)', value: 'tts-1-hd' },
-  ],
-  elevenlabs: [
-    { name: 'Eleven Multilingual v2 (Best, 29 languages)', value: 'eleven_multilingual_v2' },
-    { name: 'Eleven Turbo v2.5 (Fast, English)', value: 'eleven_turbo_v2_5' },
-    { name: 'Eleven Turbo v2', value: 'eleven_turbo_v2' },
-    { name: 'Eleven Monolingual v1 (English only)', value: 'eleven_monolingual_v1' },
-  ],
-  google: [
-    { name: 'Standard', value: 'standard' },
-    { name: 'WaveNet (High Quality)', value: 'wavenet' },
-    { name: 'Neural2 (Neural Network)', value: 'neural2' },
-    { name: 'Journey (Conversational)', value: 'journey' },
-    { name: 'Studio (Professional)', value: 'studio' },
-  ],
-  murf: [
-    { name: 'GEN2 (Latest, Highest Quality)', value: 'GEN2' },
-    { name: 'FALCON (Fast Streaming)', value: 'FALCON' },
-  ],
 };
 
 export class DemetericsSpeech implements INodeType {
@@ -132,7 +54,7 @@ export class DemetericsSpeech implements INodeType {
         name: 'provider',
         type: 'options',
         default: 'openai',
-        options: providerOptions,
+        options: ttsProviderOptions,
         description: 'Select the TTS provider',
       },
       // Model options per provider
@@ -140,8 +62,8 @@ export class DemetericsSpeech implements INodeType {
         displayName: 'Model',
         name: 'model',
         type: 'options',
-        default: 'gpt-4o-mini-tts',
-        options: modelOptions.openai,
+        default: ttsDefaultModels.openai || 'gpt-4o-mini-tts',
+        options: ttsModelOptions.openai,
         displayOptions: {
           show: {
             provider: ['openai'],
@@ -153,8 +75,8 @@ export class DemetericsSpeech implements INodeType {
         displayName: 'Model',
         name: 'model',
         type: 'options',
-        default: 'eleven_multilingual_v2',
-        options: modelOptions.elevenlabs,
+        default: ttsDefaultModels.elevenlabs || 'eleven_multilingual_v2',
+        options: ttsModelOptions.elevenlabs,
         displayOptions: {
           show: {
             provider: ['elevenlabs'],
@@ -166,8 +88,8 @@ export class DemetericsSpeech implements INodeType {
         displayName: 'Model',
         name: 'model',
         type: 'options',
-        default: 'wavenet',
-        options: modelOptions.google,
+        default: ttsDefaultModels.google || 'Neural2',
+        options: ttsModelOptions.google,
         displayOptions: {
           show: {
             provider: ['google'],
@@ -179,8 +101,8 @@ export class DemetericsSpeech implements INodeType {
         displayName: 'Model',
         name: 'model',
         type: 'options',
-        default: 'GEN2',
-        options: modelOptions.murf,
+        default: ttsDefaultModels.murf || 'GEN2',
+        options: ttsModelOptions.murf,
         displayOptions: {
           show: {
             provider: ['murf'],
@@ -193,8 +115,8 @@ export class DemetericsSpeech implements INodeType {
         displayName: 'Voice',
         name: 'voice',
         type: 'options',
-        default: 'alloy',
-        options: voiceOptions.openai,
+        default: ttsDefaultVoices.openai || 'alloy',
+        options: ttsVoiceOptions.openai,
         displayOptions: {
           show: {
             provider: ['openai'],
@@ -206,8 +128,8 @@ export class DemetericsSpeech implements INodeType {
         displayName: 'Voice',
         name: 'voice',
         type: 'options',
-        default: 'rachel',
-        options: voiceOptions.elevenlabs,
+        default: ttsDefaultVoices.elevenlabs || '21m00Tcm4TlvDq8ikWAM',
+        options: ttsVoiceOptions.elevenlabs,
         displayOptions: {
           show: {
             provider: ['elevenlabs'],
@@ -219,8 +141,8 @@ export class DemetericsSpeech implements INodeType {
         displayName: 'Voice',
         name: 'voice',
         type: 'options',
-        default: 'en-US-Wavenet-A',
-        options: voiceOptions.google,
+        default: ttsDefaultVoices.google || 'en-US-Neural2-A',
+        options: ttsVoiceOptions.google,
         displayOptions: {
           show: {
             provider: ['google'],
@@ -232,8 +154,8 @@ export class DemetericsSpeech implements INodeType {
         displayName: 'Voice',
         name: 'voice',
         type: 'options',
-        default: 'en-US-natalie',
-        options: voiceOptions.murf,
+        default: ttsDefaultVoices.murf || 'en-US-natalie',
+        options: ttsVoiceOptions.murf,
         displayOptions: {
           show: {
             provider: ['murf'],
@@ -272,13 +194,13 @@ export class DemetericsSpeech implements INodeType {
         displayName: 'Speed',
         name: 'speed',
         type: 'number',
-        default: 1.0,
+        default: ttsSpeedRange.default,
         typeOptions: {
-          minValue: 0.25,
-          maxValue: 4.0,
+          minValue: ttsSpeedRange.min,
+          maxValue: ttsSpeedRange.max,
           numberStepSize: 0.1,
         },
-        description: 'Playback speed (0.25 to 4.0)',
+        description: `Playback speed (${ttsSpeedRange.min} to ${ttsSpeedRange.max})`,
       },
       {
         displayName: 'Language',
@@ -350,9 +272,6 @@ export class DemetericsSpeech implements INodeType {
         }
 
         // Make request to Demeterics TTS API
-        console.log('[DemetericsSpeech] Making request to:', `${baseUrl}/tts/v1/generate`);
-        console.log('[DemetericsSpeech] Request body:', JSON.stringify(body, null, 2));
-
         const response = await this.helpers.httpRequest({
           method: 'POST',
           url: `${baseUrl}/tts/v1/generate`,
@@ -362,14 +281,6 @@ export class DemetericsSpeech implements INodeType {
           },
           body,
         });
-
-        console.log('[DemetericsSpeech] Response keys:', Object.keys(response));
-        console.log('[DemetericsSpeech] Has audio_base64:', !!response.audio_base64);
-        console.log('[DemetericsSpeech] Has audio:', !!response.audio);
-        console.log('[DemetericsSpeech] Has audio_url:', !!response.audio_url);
-        if (response.audio_base64) {
-          console.log('[DemetericsSpeech] audio_base64 length:', response.audio_base64.length);
-        }
 
         const audioData: INodeExecutionData = {
           json: {
@@ -394,17 +305,13 @@ export class DemetericsSpeech implements INodeType {
         }
 
         // Handle binary data if requested
-        console.log('[DemetericsSpeech] wantsBinary:', wantsBinary, 'wantsUrl:', wantsUrl);
-
         if (wantsBinary) {
           let binaryData: Buffer | null = null;
 
           // If API returned base64 audio directly
           if (response.audio || response.audio_base64) {
             const base64Data = response.audio || response.audio_base64;
-            console.log('[DemetericsSpeech] Converting base64 to binary, length:', base64Data.length);
             binaryData = Buffer.from(base64Data, 'base64');
-            console.log('[DemetericsSpeech] Binary buffer size:', binaryData.length);
           }
           // If API returned URL and we want binary, fetch the audio
           else if (response.audio_url) {
@@ -435,17 +342,12 @@ export class DemetericsSpeech implements INodeType {
               pcm: 'audio/pcm',
             };
             const mimeType = mimeTypes[format] || 'audio/mpeg';
-            console.log('[DemetericsSpeech] Creating binary data with mimeType:', mimeType, 'filename:', `audio.${format}`);
             audioData.binary = {
               data: await this.helpers.prepareBinaryData(binaryData, `audio.${format}`, mimeType),
             };
-            console.log('[DemetericsSpeech] Binary data attached to response');
-          } else {
-            console.log('[DemetericsSpeech] No binary data available');
           }
         }
 
-        console.log('[DemetericsSpeech] Final audioData has binary:', !!audioData.binary);
         returnData.push(audioData);
       } catch (error) {
         if (this.continueOnFail()) {

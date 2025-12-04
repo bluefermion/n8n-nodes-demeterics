@@ -3,65 +3,24 @@ import type {
   INodeExecutionData,
   INodeType,
   INodeTypeDescription,
-  INodePropertyOptions,
 } from 'n8n-workflow';
 
-// Provider options for the dropdown.
-const providerOptions: INodePropertyOptions[] = [
-  { name: 'OpenAI (DALL-E)', value: 'openai' },
-  { name: 'Google (Imagen)', value: 'google' },
-  { name: 'Stability AI', value: 'stability' },
-];
+// Import configuration from generated config (fetched from API)
+import {
+  imageProviderOptions,
+  imageModelOptions,
+  imageSizeOptions,
+  imageDefaultModels,
+  imageQualityOptions,
+  imageStyleOptions,
+  imageNRange,
+} from '../generated/config';
 
 // Map provider to credential field names for BYOK.
 const providerToCredentialKey: Record<string, string> = {
   openai: 'providerApiKeyOpenAI',
   google: 'providerApiKeyGemini',
   stability: 'providerApiKeyStability',
-};
-
-// Model options per provider
-const modelOptions: Record<string, INodePropertyOptions[]> = {
-  openai: [
-    { name: 'GPT Image 1 (Premium)', value: 'gpt-image-1' },
-    { name: 'GPT Image 1 Mini (~70% cheaper)', value: 'gpt-image-1-mini' },
-  ],
-  google: [
-    { name: 'Imagen 3.0 Generate', value: 'imagen-3.0-generate-002' },
-    { name: 'Imagen 3.0 Fast', value: 'imagen-3.0-fast-generate-001' },
-  ],
-  stability: [
-    { name: 'Stable Image Ultra (Highest Quality)', value: 'stable-image-ultra' },
-    { name: 'Stable Image Core', value: 'stable-image-core' },
-    { name: 'SD3 Large', value: 'sd3-large' },
-    { name: 'SD3 Medium', value: 'sd3-medium' },
-    { name: 'SDXL 1.0', value: 'stable-diffusion-xl-1024-v1-0' },
-    { name: 'SD 1.6', value: 'stable-diffusion-v1-6' },
-  ],
-};
-
-// Size options per provider
-const sizeOptions: Record<string, INodePropertyOptions[]> = {
-  openai: [
-    { name: '1024x1024 (Square)', value: '1024x1024' },
-    { name: '1536x1024 (Landscape)', value: '1536x1024' },
-    { name: '1024x1536 (Portrait)', value: '1024x1536' },
-    { name: '1792x1024 (Wide Landscape)', value: '1792x1024' },
-    { name: '1024x1792 (Tall Portrait)', value: '1024x1792' },
-  ],
-  google: [
-    { name: '1024x1024', value: '1024x1024' },
-    { name: '1536x1536', value: '1536x1536' },
-    { name: '1280x768', value: '1280x768' },
-    { name: '768x1280', value: '768x1280' },
-  ],
-  stability: [
-    { name: '1024x1024', value: '1024x1024' },
-    { name: '1152x896', value: '1152x896' },
-    { name: '896x1152', value: '896x1152' },
-    { name: '1216x832', value: '1216x832' },
-    { name: '832x1216', value: '832x1216' },
-  ],
 };
 
 export class DemetericsImage implements INodeType {
@@ -95,15 +54,15 @@ export class DemetericsImage implements INodeType {
         name: 'provider',
         type: 'options',
         default: 'openai',
-        options: providerOptions,
+        options: imageProviderOptions,
         description: 'Select the image generation provider',
       },
       {
         displayName: 'Model',
         name: 'model',
         type: 'options',
-        default: 'gpt-image-1',
-        options: modelOptions.openai,
+        default: imageDefaultModels.openai || 'gpt-image-1',
+        options: imageModelOptions.openai,
         displayOptions: {
           show: {
             provider: ['openai'],
@@ -115,8 +74,8 @@ export class DemetericsImage implements INodeType {
         displayName: 'Model',
         name: 'model',
         type: 'options',
-        default: 'imagen-3.0-generate-002',
-        options: modelOptions.google,
+        default: imageDefaultModels.google || 'imagen-3.0-generate-002',
+        options: imageModelOptions.google,
         displayOptions: {
           show: {
             provider: ['google'],
@@ -128,8 +87,8 @@ export class DemetericsImage implements INodeType {
         displayName: 'Model',
         name: 'model',
         type: 'options',
-        default: 'stable-image-core',
-        options: modelOptions.stability,
+        default: imageDefaultModels.stability || 'core',
+        options: imageModelOptions.stability,
         displayOptions: {
           show: {
             provider: ['stability'],
@@ -163,7 +122,7 @@ export class DemetericsImage implements INodeType {
         name: 'size',
         type: 'options',
         default: '1024x1024',
-        options: sizeOptions.openai,
+        options: imageSizeOptions.openai,
         displayOptions: {
           show: {
             provider: ['openai'],
@@ -176,7 +135,7 @@ export class DemetericsImage implements INodeType {
         name: 'size',
         type: 'options',
         default: '1024x1024',
-        options: sizeOptions.google,
+        options: imageSizeOptions.google,
         displayOptions: {
           show: {
             provider: ['google'],
@@ -189,7 +148,7 @@ export class DemetericsImage implements INodeType {
         name: 'size',
         type: 'options',
         default: '1024x1024',
-        options: sizeOptions.stability,
+        options: imageSizeOptions.stability,
         displayOptions: {
           show: {
             provider: ['stability'],
@@ -202,11 +161,7 @@ export class DemetericsImage implements INodeType {
         name: 'quality',
         type: 'options',
         default: 'medium',
-        options: [
-          { name: 'Low (Fastest, lowest cost)', value: 'low' },
-          { name: 'Medium (Balanced)', value: 'medium' },
-          { name: 'High (Highest detail)', value: 'high' },
-        ],
+        options: imageQualityOptions,
         displayOptions: {
           show: {
             provider: ['openai'],
@@ -219,10 +174,7 @@ export class DemetericsImage implements INodeType {
         name: 'style',
         type: 'options',
         default: 'natural',
-        options: [
-          { name: 'Natural', value: 'natural' },
-          { name: 'Vivid', value: 'vivid' },
-        ],
+        options: imageStyleOptions,
         displayOptions: {
           show: {
             provider: ['openai'],
@@ -234,12 +186,12 @@ export class DemetericsImage implements INodeType {
         displayName: 'Number of Images',
         name: 'n',
         type: 'number',
-        default: 1,
+        default: imageNRange.default,
         typeOptions: {
-          minValue: 1,
-          maxValue: 4,
+          minValue: imageNRange.min,
+          maxValue: imageNRange.max,
         },
-        description: 'Number of images to generate (1-4)',
+        description: `Number of images to generate (${imageNRange.min}-${imageNRange.max})`,
       },
       {
         displayName: 'Seed',
