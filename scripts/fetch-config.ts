@@ -238,13 +238,10 @@ function generateTypeScript(config: ServiceConfigV2): string {
   for (const provider of config.tts.providers) {
     const inputParam = provider.parameters.find(p => p.name === 'input');
     const maxChars = inputParam?.max_length || 4096;
-    const speedParam = provider.parameters.find(p => p.name === 'speed');
-    const supportsSpeed = speedParam && !speedParam.show_when?.some(c => c.field === 'provider'); // Has speed param
-    const langParam = provider.parameters.find(p => p.name === 'language');
-    const supportsLanguage = !!langParam;
-    const instrParam = provider.parameters.find(p => p.name === 'instructions');
-    const supportsInstructions = !!instrParam;
-    lines.push(`  ${provider.id}: { maxChars: ${maxChars}, supportsSpeed: ${!!speedParam}, supportsLanguage: ${supportsLanguage}, supportsInstructions: ${supportsInstructions} },`);
+    const supportsSpeed = !!provider.parameters.find(p => p.name === 'speed');
+    const supportsLanguage = !!provider.parameters.find(p => p.name === 'language');
+    const supportsInstructions = !!provider.parameters.find(p => p.name === 'instructions');
+    lines.push(`  ${provider.id}: { maxChars: ${maxChars}, supportsSpeed: ${supportsSpeed}, supportsLanguage: ${supportsLanguage}, supportsInstructions: ${supportsInstructions} },`);
   }
   lines.push('};');
   lines.push('');
