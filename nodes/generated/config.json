@@ -1,0 +1,922 @@
+{
+  "version": "1.0",
+  "updated_at": "2025-12-04T19:38:49Z",
+  "tts": {
+    "providers": [
+      {
+        "id": "openai",
+        "display_name": "OpenAI TTS",
+        "parameters": [
+          {
+            "name": "model",
+            "display_name": "Model",
+            "type": "options",
+            "required": true,
+            "default": "gpt-4o-mini-tts",
+            "options": [
+              {
+                "value": "gpt-4o-mini-tts",
+                "label": "GPT-4o Mini TTS (Latest)",
+                "description": "Newest model with voice instructions support",
+                "default": true
+              },
+              {
+                "value": "tts-1",
+                "label": "TTS-1 (Standard)",
+                "description": "Fast, good quality"
+              },
+              {
+                "value": "tts-1-hd",
+                "label": "TTS-1 HD (High Quality)",
+                "description": "Higher quality, slightly slower"
+              }
+            ]
+          },
+          {
+            "name": "voice",
+            "display_name": "Voice",
+            "type": "options",
+            "required": true,
+            "default": "alloy",
+            "options": [
+              {
+                "value": "alloy",
+                "label": "Alloy (Neutral)",
+                "default": true
+              },
+              {
+                "value": "ash",
+                "label": "Ash (Warm Male)"
+              },
+              {
+                "value": "ballad",
+                "label": "Ballad (Soft Female)"
+              },
+              {
+                "value": "coral",
+                "label": "Coral (Friendly Female)"
+              },
+              {
+                "value": "echo",
+                "label": "Echo (Warm Male)"
+              },
+              {
+                "value": "fable",
+                "label": "Fable (Expressive)"
+              },
+              {
+                "value": "onyx",
+                "label": "Onyx (Deep Male)"
+              },
+              {
+                "value": "nova",
+                "label": "Nova (Friendly Female)"
+              },
+              {
+                "value": "sage",
+                "label": "Sage (Calm)"
+              },
+              {
+                "value": "shimmer",
+                "label": "Shimmer (Soft Female)"
+              },
+              {
+                "value": "verse",
+                "label": "Verse (Dynamic Male)"
+              }
+            ]
+          },
+          {
+            "name": "input",
+            "ui_name": "text",
+            "display_name": "Text",
+            "description": "Text to convert to speech (max 4096 characters)",
+            "type": "string",
+            "required": true,
+            "rows": 4,
+            "max_length": 4096
+          },
+          {
+            "name": "format",
+            "display_name": "Output Format",
+            "type": "options",
+            "default": "mp3",
+            "options": [
+              {
+                "value": "mp3",
+                "label": "MP3",
+                "default": true
+              },
+              {
+                "value": "opus",
+                "label": "Opus"
+              },
+              {
+                "value": "aac",
+                "label": "AAC"
+              },
+              {
+                "value": "flac",
+                "label": "FLAC"
+              },
+              {
+                "value": "wav",
+                "label": "WAV"
+              },
+              {
+                "value": "pcm",
+                "label": "PCM"
+              }
+            ]
+          },
+          {
+            "name": "speed",
+            "display_name": "Speed",
+            "description": "Playback speed (0.25 to 4.0)",
+            "type": "number",
+            "default": 1,
+            "min": 0.25,
+            "max": 4,
+            "step": 0.1
+          },
+          {
+            "name": "instructions",
+            "display_name": "Voice Instructions",
+            "description": "Voice style instructions (gpt-4o-mini-tts only). E.g., 'Speak warmly' or 'Read as a news anchor'",
+            "type": "string",
+            "rows": 3,
+            "show_when": [
+              {
+                "field": "model",
+                "in": [
+                  "gpt-4o-mini-tts"
+                ]
+              }
+            ],
+            "omit_if_empty": true,
+            "omit_for": [
+              "tts-1",
+              "tts-1-hd"
+            ]
+          }
+        ],
+        "api_reference": "https://platform.openai.com/docs/api-reference/audio/createSpeech"
+      },
+      {
+        "id": "elevenlabs",
+        "display_name": "ElevenLabs",
+        "parameters": [
+          {
+            "name": "model",
+            "display_name": "Model",
+            "type": "options",
+            "required": true,
+            "default": "eleven_multilingual_v2",
+            "options": [
+              {
+                "value": "eleven_multilingual_v2",
+                "label": "Multilingual V2",
+                "description": "Best quality, supports 29 languages",
+                "default": true
+              },
+              {
+                "value": "eleven_turbo_v2",
+                "label": "Turbo V2 (Faster)",
+                "description": "Lower latency, English optimized"
+              },
+              {
+                "value": "eleven_monolingual_v1",
+                "label": "Monolingual V1",
+                "description": "Legacy English model"
+              }
+            ]
+          },
+          {
+            "name": "voice",
+            "display_name": "Voice",
+            "type": "options",
+            "required": true,
+            "default": "21m00Tcm4TlvDq8ikWAM",
+            "options": [
+              {
+                "value": "21m00Tcm4TlvDq8ikWAM",
+                "label": "Rachel",
+                "default": true
+              },
+              {
+                "value": "AZnzlk1XvdvUeBnXmlld",
+                "label": "Domi"
+              },
+              {
+                "value": "EXAVITQu4vr4xnSDxMaL",
+                "label": "Bella"
+              },
+              {
+                "value": "ErXwobaYiN019PkySvjV",
+                "label": "Antoni"
+              },
+              {
+                "value": "MF3mGyEYCl7XYWbV9V6O",
+                "label": "Elli"
+              },
+              {
+                "value": "TxGEqnHWrfWFTfGW9XjX",
+                "label": "Josh"
+              },
+              {
+                "value": "VR6AewLTigWG4xSOukaG",
+                "label": "Arnold"
+              },
+              {
+                "value": "pNInz6obpgDQGcFmaJgB",
+                "label": "Adam"
+              },
+              {
+                "value": "yoZ06aMxZJJ28mfd3POQ",
+                "label": "Sam"
+              }
+            ]
+          },
+          {
+            "name": "input",
+            "ui_name": "text",
+            "display_name": "Text",
+            "description": "Text to convert to speech (max 5000 characters)",
+            "type": "string",
+            "required": true,
+            "rows": 4,
+            "max_length": 5000
+          },
+          {
+            "name": "format",
+            "display_name": "Output Format",
+            "type": "options",
+            "default": "mp3_44100_128",
+            "options": [
+              {
+                "value": "mp3_44100_128",
+                "label": "MP3 (44.1kHz, 128kbps)",
+                "default": true
+              },
+              {
+                "value": "mp3_44100_192",
+                "label": "MP3 (44.1kHz, 192kbps)"
+              },
+              {
+                "value": "pcm_16000",
+                "label": "PCM (16kHz)"
+              },
+              {
+                "value": "pcm_22050",
+                "label": "PCM (22.05kHz)"
+              },
+              {
+                "value": "pcm_24000",
+                "label": "PCM (24kHz)"
+              },
+              {
+                "value": "pcm_44100",
+                "label": "PCM (44.1kHz)"
+              }
+            ]
+          }
+        ],
+        "api_reference": "https://elevenlabs.io/docs/api-reference/text-to-speech"
+      },
+      {
+        "id": "google",
+        "display_name": "Google Cloud TTS",
+        "parameters": [
+          {
+            "name": "model",
+            "display_name": "Voice Type",
+            "type": "options",
+            "required": true,
+            "default": "Neural2",
+            "options": [
+              {
+                "value": "Neural2",
+                "label": "Neural2 (Recommended)",
+                "description": "Best quality neural voices",
+                "default": true
+              },
+              {
+                "value": "WaveNet",
+                "label": "WaveNet",
+                "description": "High quality, slightly older"
+              },
+              {
+                "value": "Standard",
+                "label": "Standard (Budget)",
+                "description": "Lower cost, basic quality"
+              },
+              {
+                "value": "Studio",
+                "label": "Studio (Premium)",
+                "description": "Premium studio quality"
+              }
+            ]
+          },
+          {
+            "name": "voice",
+            "display_name": "Voice",
+            "type": "options",
+            "required": true,
+            "default": "en-US-Neural2-A",
+            "options": [
+              {
+                "value": "en-US-Neural2-A",
+                "label": "US Female A",
+                "default": true
+              },
+              {
+                "value": "en-US-Neural2-C",
+                "label": "US Female C"
+              },
+              {
+                "value": "en-US-Neural2-D",
+                "label": "US Male D"
+              },
+              {
+                "value": "en-US-Neural2-E",
+                "label": "US Female E"
+              },
+              {
+                "value": "en-US-Neural2-F",
+                "label": "US Female F"
+              },
+              {
+                "value": "en-US-Neural2-G",
+                "label": "US Female G"
+              },
+              {
+                "value": "en-US-Neural2-H",
+                "label": "US Female H"
+              },
+              {
+                "value": "en-US-Neural2-I",
+                "label": "US Male I"
+              },
+              {
+                "value": "en-US-Neural2-J",
+                "label": "US Male J"
+              },
+              {
+                "value": "en-GB-Neural2-A",
+                "label": "UK Female A"
+              },
+              {
+                "value": "en-GB-Neural2-B",
+                "label": "UK Male B"
+              },
+              {
+                "value": "en-GB-Neural2-C",
+                "label": "UK Female C"
+              },
+              {
+                "value": "en-GB-Neural2-D",
+                "label": "UK Male D"
+              }
+            ]
+          },
+          {
+            "name": "input",
+            "ui_name": "text",
+            "display_name": "Text",
+            "description": "Text to convert to speech (max 5000 characters)",
+            "type": "string",
+            "required": true,
+            "rows": 4,
+            "max_length": 5000
+          },
+          {
+            "name": "format",
+            "display_name": "Output Format",
+            "type": "options",
+            "default": "MP3",
+            "options": [
+              {
+                "value": "MP3",
+                "label": "MP3",
+                "default": true
+              },
+              {
+                "value": "LINEAR16",
+                "label": "WAV (LINEAR16)"
+              },
+              {
+                "value": "OGG_OPUS",
+                "label": "OGG Opus"
+              },
+              {
+                "value": "MULAW",
+                "label": "MULAW"
+              },
+              {
+                "value": "ALAW",
+                "label": "ALAW"
+              }
+            ]
+          },
+          {
+            "name": "speed",
+            "display_name": "Speed",
+            "description": "Speaking rate (0.25 to 4.0)",
+            "type": "number",
+            "default": 1,
+            "min": 0.25,
+            "max": 4,
+            "step": 0.1
+          }
+        ],
+        "api_reference": "https://cloud.google.com/text-to-speech/docs/reference/rest/v1/text/synthesize"
+      },
+      {
+        "id": "murf",
+        "display_name": "Murf.ai",
+        "parameters": [
+          {
+            "name": "model",
+            "display_name": "Model",
+            "type": "options",
+            "required": true,
+            "default": "GEN2",
+            "options": [
+              {
+                "value": "GEN2",
+                "label": "GEN2 (Latest)",
+                "description": "Latest generation voices",
+                "default": true
+              },
+              {
+                "value": "FALCON",
+                "label": "Falcon (Streaming)",
+                "description": "Optimized for streaming"
+              }
+            ]
+          },
+          {
+            "name": "voice",
+            "display_name": "Voice",
+            "type": "options",
+            "required": true,
+            "default": "en-US-natalie",
+            "options": [
+              {
+                "value": "en-US-natalie",
+                "label": "Natalie (US Female)",
+                "default": true
+              },
+              {
+                "value": "en-US-marcus",
+                "label": "Marcus (US Male)"
+              },
+              {
+                "value": "en-US-terrell",
+                "label": "Terrell (US Male)"
+              },
+              {
+                "value": "en-GB-hazel",
+                "label": "Hazel (UK Female)"
+              },
+              {
+                "value": "en-GB-harry",
+                "label": "Harry (UK Male)"
+              }
+            ]
+          },
+          {
+            "name": "input",
+            "ui_name": "text",
+            "display_name": "Text",
+            "description": "Text to convert to speech (max 10000 characters)",
+            "type": "string",
+            "required": true,
+            "rows": 4,
+            "max_length": 10000
+          },
+          {
+            "name": "format",
+            "display_name": "Output Format",
+            "type": "options",
+            "default": "MP3",
+            "options": [
+              {
+                "value": "MP3",
+                "label": "MP3",
+                "default": true
+              },
+              {
+                "value": "WAV",
+                "label": "WAV"
+              },
+              {
+                "value": "FLAC",
+                "label": "FLAC"
+              },
+              {
+                "value": "OGG",
+                "label": "OGG"
+              },
+              {
+                "value": "PCM",
+                "label": "PCM"
+              },
+              {
+                "value": "ALAW",
+                "label": "ALAW"
+              },
+              {
+                "value": "ULAW",
+                "label": "ULAW"
+              }
+            ]
+          },
+          {
+            "name": "speed",
+            "display_name": "Speed",
+            "description": "Playback speed (0.25 to 4.0)",
+            "type": "number",
+            "default": 1,
+            "min": 0.25,
+            "max": 4,
+            "step": 0.1
+          },
+          {
+            "name": "language",
+            "display_name": "Language",
+            "description": "Language code (ISO 639-1). Leave empty for auto-detection.",
+            "placeholder": "e.g., en, es, fr, de",
+            "type": "string",
+            "omit_if_empty": true
+          }
+        ],
+        "api_reference": "https://murf.ai/api/docs"
+      }
+    ]
+  },
+  "image": {
+    "providers": [
+      {
+        "id": "openai",
+        "display_name": "OpenAI Image Generation",
+        "parameters": [
+          {
+            "name": "model",
+            "display_name": "Model",
+            "type": "options",
+            "required": true,
+            "default": "gpt-image-1",
+            "options": [
+              {
+                "value": "gpt-image-1",
+                "label": "GPT Image 1 (Premium)",
+                "description": "Best quality, $0.011-0.167/image",
+                "default": true
+              },
+              {
+                "value": "gpt-image-1-mini",
+                "label": "GPT Image 1 Mini (~70% cheaper)",
+                "description": "Cost-effective, $0.005-0.052/image"
+              }
+            ]
+          },
+          {
+            "name": "prompt",
+            "display_name": "Prompt",
+            "description": "Description of the image to generate (max 4000 characters)",
+            "type": "string",
+            "required": true,
+            "rows": 4,
+            "max_length": 4000
+          },
+          {
+            "name": "size",
+            "display_name": "Size",
+            "type": "options",
+            "default": "1024x1024",
+            "options": [
+              {
+                "value": "1024x1024",
+                "label": "1024x1024 (1:1 Square)",
+                "default": true
+              },
+              {
+                "value": "1536x1024",
+                "label": "1536x1024 (3:2 Landscape)"
+              },
+              {
+                "value": "1024x1536",
+                "label": "1024x1536 (2:3 Portrait)"
+              },
+              {
+                "value": "1792x1024",
+                "label": "1792x1024 (16:9 Wide)"
+              },
+              {
+                "value": "1024x1792",
+                "label": "1024x1792 (9:16 Tall)"
+              }
+            ]
+          },
+          {
+            "name": "quality",
+            "display_name": "Quality",
+            "description": "Image quality affects generation time and cost",
+            "type": "options",
+            "default": "medium",
+            "options": [
+              {
+                "value": "low",
+                "label": "Low (Fastest)"
+              },
+              {
+                "value": "medium",
+                "label": "Medium (Balanced)",
+                "default": true
+              },
+              {
+                "value": "high",
+                "label": "High (Best Quality)"
+              }
+            ]
+          },
+          {
+            "name": "n",
+            "display_name": "Number of Images",
+            "description": "Number of images to generate (1-4)",
+            "type": "number",
+            "default": 1,
+            "min": 1,
+            "max": 4,
+            "step": 1
+          },
+          {
+            "name": "seed",
+            "display_name": "Seed",
+            "description": "Seed for reproducibility (0 for random)",
+            "type": "number",
+            "default": 0,
+            "min": 0,
+            "max": 4294967295,
+            "step": 1,
+            "omit_if_empty": true
+          }
+        ],
+        "api_reference": "https://platform.openai.com/docs/api-reference/images/create"
+      },
+      {
+        "id": "google",
+        "display_name": "Google Imagen",
+        "parameters": [
+          {
+            "name": "model",
+            "display_name": "Model",
+            "type": "options",
+            "required": true,
+            "default": "imagen-3.0-generate-002",
+            "options": [
+              {
+                "value": "imagen-3.0-generate-002",
+                "label": "Imagen 3.0 Generate",
+                "description": "Latest generation model",
+                "default": true
+              },
+              {
+                "value": "imagen-3.0-fast-generate-001",
+                "label": "Imagen 3.0 Fast",
+                "description": "Faster generation, slightly lower quality"
+              }
+            ]
+          },
+          {
+            "name": "prompt",
+            "display_name": "Prompt",
+            "description": "Description of the image to generate (max 5000 characters)",
+            "type": "string",
+            "required": true,
+            "rows": 4,
+            "max_length": 5000
+          },
+          {
+            "name": "negative_prompt",
+            "ui_name": "negativePrompt",
+            "display_name": "Negative Prompt",
+            "description": "What to avoid in the image",
+            "type": "string",
+            "rows": 2,
+            "omit_if_empty": true
+          },
+          {
+            "name": "size",
+            "display_name": "Size",
+            "type": "options",
+            "default": "1024x1024",
+            "options": [
+              {
+                "value": "1024x1024",
+                "label": "1024x1024 (1:1 Square)",
+                "default": true
+              },
+              {
+                "value": "1536x1536",
+                "label": "1536x1536 (1:1 Large Square)"
+              },
+              {
+                "value": "1280x768",
+                "label": "1280x768 (5:3 Landscape)"
+              },
+              {
+                "value": "768x1280",
+                "label": "768x1280 (3:5 Portrait)"
+              }
+            ]
+          },
+          {
+            "name": "n",
+            "display_name": "Number of Images",
+            "description": "Number of images to generate (1-4)",
+            "type": "number",
+            "default": 1,
+            "min": 1,
+            "max": 4,
+            "step": 1
+          },
+          {
+            "name": "seed",
+            "display_name": "Seed",
+            "description": "Seed for reproducibility (0 for random)",
+            "type": "number",
+            "default": 0,
+            "min": 0,
+            "max": 4294967295,
+            "step": 1,
+            "omit_if_empty": true
+          }
+        ],
+        "api_reference": "https://cloud.google.com/vertex-ai/generative-ai/docs/image/generate-images"
+      },
+      {
+        "id": "stability",
+        "display_name": "Stability AI",
+        "parameters": [
+          {
+            "name": "model",
+            "display_name": "Model",
+            "type": "options",
+            "required": true,
+            "default": "core",
+            "options": [
+              {
+                "value": "ultra",
+                "label": "Stable Image Ultra (Highest Quality)",
+                "description": "$0.08/image"
+              },
+              {
+                "value": "core",
+                "label": "Stable Image Core (Balanced)",
+                "description": "$0.03/image",
+                "default": true
+              },
+              {
+                "value": "sd3-large",
+                "label": "SD3 Large",
+                "description": "$0.065/image"
+              },
+              {
+                "value": "sd3-medium",
+                "label": "SD3 Medium",
+                "description": "$0.035/image"
+              }
+            ]
+          },
+          {
+            "name": "prompt",
+            "display_name": "Prompt",
+            "description": "Description of the image to generate (max 10000 characters)",
+            "type": "string",
+            "required": true,
+            "rows": 4,
+            "max_length": 10000
+          },
+          {
+            "name": "negative_prompt",
+            "ui_name": "negativePrompt",
+            "display_name": "Negative Prompt",
+            "description": "What to avoid in the image",
+            "type": "string",
+            "rows": 2,
+            "omit_if_empty": true
+          },
+          {
+            "name": "size",
+            "display_name": "Size",
+            "type": "options",
+            "default": "1024x1024",
+            "options": [
+              {
+                "value": "1024x1024",
+                "label": "1024x1024 (1:1 Square)",
+                "default": true
+              },
+              {
+                "value": "1344x768",
+                "label": "1344x768 (16:9 Landscape)"
+              },
+              {
+                "value": "768x1344",
+                "label": "768x1344 (9:16 Portrait)"
+              },
+              {
+                "value": "1216x832",
+                "label": "1216x832 (3:2 Landscape)"
+              },
+              {
+                "value": "832x1216",
+                "label": "832x1216 (2:3 Portrait)"
+              },
+              {
+                "value": "1088x896",
+                "label": "1088x896 (5:4 Landscape)"
+              },
+              {
+                "value": "896x1088",
+                "label": "896x1088 (4:5 Portrait)"
+              },
+              {
+                "value": "1536x640",
+                "label": "1536x640 (21:9 Ultra-wide)"
+              },
+              {
+                "value": "640x1536",
+                "label": "640x1536 (9:21 Ultra-tall)"
+              }
+            ]
+          },
+          {
+            "name": "n",
+            "display_name": "Number of Images",
+            "description": "Number of images to generate (1-4)",
+            "type": "number",
+            "default": 1,
+            "min": 1,
+            "max": 4,
+            "step": 1
+          },
+          {
+            "name": "seed",
+            "display_name": "Seed",
+            "description": "Seed for reproducibility (0 for random)",
+            "type": "number",
+            "default": 0,
+            "min": 0,
+            "max": 4294967295,
+            "step": 1,
+            "omit_if_empty": true
+          }
+        ],
+        "api_reference": "https://platform.stability.ai/docs/api-reference#tag/Generate"
+      }
+    ]
+  },
+  "chat": {
+    "providers": [
+      {
+        "id": "groq",
+        "display_name": "Groq",
+        "base_url": "https://api.demeterics.com/groq/v1",
+        "models": []
+      },
+      {
+        "id": "openai",
+        "display_name": "OpenAI",
+        "base_url": "https://api.demeterics.com/openai/v1",
+        "models": []
+      },
+      {
+        "id": "anthropic",
+        "display_name": "Anthropic",
+        "base_url": "https://api.demeterics.com/anthropic/v1",
+        "models": []
+      },
+      {
+        "id": "gemini",
+        "display_name": "Google Gemini",
+        "base_url": "https://api.demeterics.com/gemini/v1",
+        "models": []
+      },
+      {
+        "id": "google",
+        "display_name": "Google AI",
+        "base_url": "https://api.demeterics.com/google/v1",
+        "models": []
+      },
+      {
+        "id": "openrouter",
+        "display_name": "OpenRouter",
+        "base_url": "https://api.demeterics.com/openrouter/v1",
+        "models": []
+      }
+    ]
+  }
+}
