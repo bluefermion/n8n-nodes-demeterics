@@ -7,6 +7,8 @@ import type {
   INodePropertyOptions,
 } from 'n8n-workflow';
 
+import { getValidatedBaseUrl } from '../utils/security';
+
 // Provider options for the dropdown.
 const providerOptions: INodePropertyOptions[] = [
   { name: 'Groq', value: 'groq' },
@@ -424,7 +426,7 @@ export class DemetericsChat implements INodeType {
           const credentials = await this.getCredentials('demetericsApi');
           const demetericsKey = (credentials.apiKey as string) || '';
           const byok = Boolean(credentials.byok);
-          const baseUrl = ((credentials.baseUrl as string) || 'https://api.demeterics.com').replace(/\/$/, '');
+          const baseUrl = getValidatedBaseUrl(credentials.baseUrl as string);
 
           // Build API key (combine with vendor key if BYOK)
           const vendorKeyField = providerToCredentialKey[provider];
@@ -505,7 +507,7 @@ export class DemetericsChat implements INodeType {
       const credentials = await this.getCredentials('demetericsApi');
       const demetericsKey = (credentials.apiKey as string) || '';
       const byok = Boolean(credentials.byok);
-      const baseUrl = ((credentials.baseUrl as string) || 'https://api.demeterics.com').replace(/\/$/, '');
+      const baseUrl = getValidatedBaseUrl(credentials.baseUrl as string);
 
       // Build API key (combine with vendor key if BYOK)
       const vendorKeyField = providerToCredentialKey[provider];
@@ -643,23 +645,78 @@ export class DemetericsChat implements INodeType {
         }
       }
 
-      // Determine endpoint URL
+      // Determine endpoint URL and request format
       const providerBase = providerBaseMap[provider] ?? 'openai';
       let url: string;
-      if (apiEndpoint === 'responses') {
-        url = `${baseUrl}/${providerBase}/v1/responses`;
+      let requestBody: Record<string, unknown>;
+      let requestHeaders: Record<string, string>;
+      const isAnthropic = provider === 'anthropic';
+
+      if (isAnthropic) {
+        // Anthropic uses /v1/messages with a different request format
+        url = `${baseUrl}/${providerBase}/v1/messages`;
+        requestHeaders = {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+          'anthropic-version': '2023-06-01',
+        };
+
+        // Convert OpenAI-style messages to Anthropic format
+        // Anthropic has separate 'system' field and 'messages' array (no system role in messages)
+        const anthropicMessages: Array<{ role: string; content: string }> = [];
+        let systemContent = '';
+
+        for (const msg of messages) {
+          if (msg.role === 'system') {
+            systemContent = msg.content;
+          } else {
+            anthropicMessages.push({
+              role: msg.role === 'assistant' ? 'assistant' : 'user',
+              content: msg.content,
+            });
+          }
+        }
+
+        requestBody = {
+          model,
+          messages: anthropicMessages,
+          max_tokens: options.maxTokens ?? 4096,
+        };
+
+        if (systemContent) {
+          requestBody.system = systemContent;
+        }
+        if (options.temperature !== undefined) {
+          requestBody.temperature = options.temperature;
+        }
+        if (options.topP !== undefined) {
+          requestBody.top_p = options.topP;
+        }
+        if (options.stop) {
+          const stopSequences = options.stop.split(',').map((s) => s.trim()).filter((s) => s);
+          if (stopSequences.length > 0) {
+            requestBody.stop_sequences = stopSequences.slice(0, 4);
+          }
+        }
       } else {
-        url = `${baseUrl}/${providerBase}/v1/chat/completions`;
+        // OpenAI-compatible providers
+        if (apiEndpoint === 'responses') {
+          url = `${baseUrl}/${providerBase}/v1/responses`;
+        } else {
+          url = `${baseUrl}/${providerBase}/v1/chat/completions`;
+        }
+        requestHeaders = {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        };
+        requestBody = body;
       }
 
       const response = await this.helpers.httpRequest({
         method: 'POST',
         url,
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body,
+        headers: requestHeaders,
+        body: requestBody,
         timeout: (options.timeout ?? 60) * 1000,
       });
 
@@ -668,7 +725,20 @@ export class DemetericsChat implements INodeType {
       let toolCalls = null;
       const fullResponse = response;
 
-      if (apiEndpoint === 'completions') {
+      if (isAnthropic) {
+        // Anthropic response format: { content: [{ type: 'text', text: '...' }], ... }
+        if (response?.content && Array.isArray(response.content)) {
+          const textBlocks = response.content.filter((block: { type: string }) => block.type === 'text');
+          content = textBlocks.map((block: { text: string }) => block.text).join('');
+        }
+        // Extract tool use blocks if present
+        if (response?.content && Array.isArray(response.content)) {
+          const toolUseBlocks = response.content.filter((block: { type: string }) => block.type === 'tool_use');
+          if (toolUseBlocks.length > 0) {
+            toolCalls = toolUseBlocks;
+          }
+        }
+      } else if (apiEndpoint === 'completions') {
         // OpenAI-compatible response format
         const message = response?.choices?.[0]?.message;
         if (message?.content) {

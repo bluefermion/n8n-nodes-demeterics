@@ -5,6 +5,8 @@ import type {
   INodeTypeDescription,
 } from 'n8n-workflow';
 
+import { getValidatedBaseUrl } from '../utils/security';
+
 // Note: class name must match file base name for n8n custom loader
 export class DemetericsCohort implements INodeType {
   description: INodeTypeDescription = {
@@ -124,7 +126,7 @@ export class DemetericsCohort implements INodeType {
 
       // Read base URL from credentials to align with testing and self-hosting
       const credentials = await this.getCredentials('demetericsApi');
-      const baseUrl = ((credentials.baseUrl as string) || 'https://api.demeterics.com').replace(/\/$/, '');
+      const baseUrl = getValidatedBaseUrl(credentials.baseUrl as string);
 
       if (operation === 'submit') {
         const outcome = this.getNodeParameter('outcome', i, undefined) as number | undefined;

@@ -1,3 +1,4 @@
+import { ChatAnthropic } from '@langchain/anthropic';
 import { ChatOpenAI } from '@langchain/openai';
 import type {
   INodeType,
@@ -8,6 +9,8 @@ import type {
   INodePropertyOptions,
 } from 'n8n-workflow';
 import { NodeConnectionTypes } from 'n8n-workflow';
+
+import { getValidatedBaseUrl } from '../utils/security';
 
 // Provider options for the dropdown.
 const providerOptions: INodePropertyOptions[] = [
@@ -140,7 +143,7 @@ export class DemetericsChatModel implements INodeType {
           const credentials = await this.getCredentials('demetericsApi');
           const demetericsKey = (credentials.apiKey as string) || '';
           const byok = Boolean(credentials.byok);
-          const baseUrl = ((credentials.baseUrl as string) || 'https://api.demeterics.com').replace(/\/$/, '');
+          const baseUrl = getValidatedBaseUrl(credentials.baseUrl as string);
 
           // Build API key (combine with vendor key if BYOK)
           const vendorKeyField = providerToCredentialKey[provider];
@@ -190,7 +193,7 @@ export class DemetericsChatModel implements INodeType {
     const credentials = await this.getCredentials('demetericsApi');
     const demetericsKey = (credentials.apiKey as string) || '';
     const byok = Boolean(credentials.byok);
-    const baseUrl = (credentials.baseUrl as string) || 'https://api.demeterics.com';
+    const baseUrl = getValidatedBaseUrl(credentials.baseUrl as string);
 
     const provider = this.getNodeParameter('provider', 0) as string;
     const model = this.getNodeParameter('model', 0) as string;
@@ -209,6 +212,21 @@ export class DemetericsChatModel implements INodeType {
     const vendorKey = vendorKeyField ? ((credentials as Record<string, unknown>)[vendorKeyField] as string) || '' : '';
     const apiKey = byok && vendorKey ? `${demetericsKey};${vendorKey}` : demetericsKey;
 
+    // Use ChatAnthropic for Anthropic provider, ChatOpenAI for all others
+    if (provider === 'anthropic') {
+      const chatModel = new ChatAnthropic({
+        anthropicApiKey: apiKey,
+        anthropicApiUrl: `${baseUrl.replace(/\/$/, '')}/${providerBase}`,
+        model,
+        temperature: options.temperature ?? 0.7,
+        maxTokens: options.maxTokens ?? 4096,
+        topP: options.topP ?? 1,
+      });
+
+      return { response: chatModel };
+    }
+
+    // Use ChatOpenAI for OpenAI-compatible providers (groq, openai, google, openrouter)
     const chatModel = new ChatOpenAI({
       apiKey,
       model,

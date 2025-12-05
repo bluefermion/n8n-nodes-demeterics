@@ -5,6 +5,8 @@ import type {
   INodeTypeDescription,
 } from 'n8n-workflow';
 
+import { getValidatedBaseUrl } from '../utils/security';
+
 // Import configuration from generated config (fetched from API)
 import {
   ttsProviderOptions,
@@ -299,7 +301,7 @@ export class DemetericsSpeech implements INodeType {
     const credentials = await this.getCredentials('demetericsApi');
     const byokMode = credentials.byokMode as boolean;
     const demetericsApiKey = credentials.apiKey as string;
-    const baseUrl = (credentials.baseUrl as string) || 'https://api.demeterics.com';
+    const baseUrl = getValidatedBaseUrl(credentials.baseUrl as string);
 
     for (let i = 0; i < items.length; i++) {
       try {

@@ -6,6 +6,8 @@ import type {
   INodeTypeDescription,
 } from 'n8n-workflow';
 
+import { getValidatedBaseUrl, isValidRequestId } from '../utils/security';
+
 type ExportFormat = 'json' | 'csv' | 'avro';
 type TableName = 'interactions' | 'eval_runs' | 'eval_results';
 
@@ -142,7 +144,7 @@ export class DemetericsExtract implements INodeType {
       const operation = this.getNodeParameter('operation', i) as 'exportSimple' | 'create' | 'stream';
 
       const credentials = await this.getCredentials('demetericsApi');
-      const baseUrl = ((credentials.baseUrl as string) || 'https://api.demeterics.com').replace(/\/$/, '');
+      const baseUrl = getValidatedBaseUrl(credentials.baseUrl as string);
 
       if (operation === 'create' || operation === 'exportSimple') {
         const format = this.getNodeParameter('format', i, 'json') as ExportFormat;
@@ -232,6 +234,12 @@ export class DemetericsExtract implements INodeType {
         }
       } else if (operation === 'stream') {
         const requestId = this.getNodeParameter('requestId', i) as string;
+
+        // Validate requestId to prevent path traversal attacks
+        if (!isValidRequestId(requestId)) {
+          throw new Error('Invalid request ID format. Request ID must contain only alphanumeric characters, hyphens, and underscores.');
+        }
+
         const streamFormat = this.getNodeParameter('streamFormat', i, 'json') as 'json' | 'csv';
         const streamUrl = `${baseUrl}/api/v1/exports/${requestId}/stream`;
 

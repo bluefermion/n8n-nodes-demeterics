@@ -95,6 +95,15 @@
     }
   },
   "dependencies": {
+    "@langchain/anthropic": "^0.3.14",
     "@langchain/openai": "^0.3.17"
+  },
+  "overrides": {
+    "form-data": ">=4.0.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "form-data": ">=4.0.1"
+    }
   }
 }
