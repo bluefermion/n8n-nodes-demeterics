@@ -212,7 +212,7 @@ export class DemetericsChatModel implements INodeType {
     const vendorKey = vendorKeyField ? ((credentials as Record<string, unknown>)[vendorKeyField] as string) || '' : '';
     const apiKey = byok && vendorKey ? `${demetericsKey};${vendorKey}` : demetericsKey;
 
-    // Use ChatAnthropic for Anthropic provider, ChatOpenAI for all others
+    // Use ChatAnthropic for Anthropic provider to get native Anthropic API format
     if (provider === 'anthropic') {
       const chatModel = new ChatAnthropic({
         anthropicApiKey: apiKey,
