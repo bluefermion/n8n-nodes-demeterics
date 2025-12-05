@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2025-12-04T20:18:22Z",
+  "updated_at": "2025-12-05T03:35:43Z",
   "tts": {
     "providers": [
       {
@@ -877,6 +877,158 @@
           }
         ],
         "api_reference": "https://platform.stability.ai/docs/api-reference#tag/Generate"
+      },
+      {
+        "id": "leonardo",
+        "display_name": "Leonardo AI",
+        "parameters": [
+          {
+            "name": "model",
+            "display_name": "Model",
+            "type": "options",
+            "required": true,
+            "default": "phoenix",
+            "options": [
+              {
+                "value": "phoenix",
+                "label": "Phoenix 1.0 (Flagship)",
+                "description": "Latest flagship model, best quality",
+                "default": true
+              },
+              {
+                "value": "kino-xl",
+                "label": "Kino XL (Cinematic)",
+                "description": "Cinematic and dramatic style"
+              },
+              {
+                "value": "vision-xl",
+                "label": "Vision XL (Photorealistic)",
+                "description": "High-fidelity photorealistic images"
+              },
+              {
+                "value": "diffusion-xl",
+                "label": "Diffusion XL (Versatile)",
+                "description": "General purpose, versatile output"
+              },
+              {
+                "value": "lightning-xl",
+                "label": "Lightning XL (Fast)",
+                "description": "Fast generation, lower cost"
+              },
+              {
+                "value": "anime-xl",
+                "label": "Anime XL (Anime)",
+                "description": "Optimized for anime style"
+              }
+            ]
+          },
+          {
+            "name": "prompt",
+            "display_name": "Prompt",
+            "description": "Description of the image to generate (max 1000 characters)",
+            "type": "string",
+            "required": true,
+            "rows": 4,
+            "max_length": 1000
+          },
+          {
+            "name": "negative_prompt",
+            "ui_name": "negativePrompt",
+            "display_name": "Negative Prompt",
+            "description": "What to avoid in the image",
+            "type": "string",
+            "rows": 2,
+            "omit_if_empty": true
+          },
+          {
+            "name": "size",
+            "display_name": "Size",
+            "type": "options",
+            "default": "1024x1024",
+            "options": [
+              {
+                "value": "1024x1024",
+                "label": "1024x1024 (1:1 Square)",
+                "default": true
+              },
+              {
+                "value": "1472x832",
+                "label": "1472x832 (16:9 Landscape)"
+              },
+              {
+                "value": "832x1472",
+                "label": "832x1472 (9:16 Portrait)"
+              },
+              {
+                "value": "1280x832",
+                "label": "1280x832 (3:2 Landscape)"
+              },
+              {
+                "value": "832x1280",
+                "label": "832x1280 (2:3 Portrait)"
+              },
+              {
+                "value": "1152x896",
+                "label": "1152x896 (4:3 Landscape)"
+              },
+              {
+                "value": "896x1152",
+                "label": "896x1152 (3:4 Portrait)"
+              },
+              {
+                "value": "512x512",
+                "label": "512x512 (1:1 Small)"
+              }
+            ]
+          },
+          {
+            "name": "quality",
+            "display_name": "Quality",
+            "description": "Alchemy quality enhancement mode",
+            "type": "options",
+            "default": "standard",
+            "options": [
+              {
+                "value": "fast",
+                "label": "Fast (No Alchemy)",
+                "description": "Fastest generation"
+              },
+              {
+                "value": "standard",
+                "label": "Standard (Alchemy v1)",
+                "description": "Balanced quality",
+                "default": true
+              },
+              {
+                "value": "high",
+                "label": "High (Alchemy v2)",
+                "description": "Best quality enhancement"
+              }
+            ]
+          },
+          {
+            "name": "n",
+            "display_name": "Number of Images",
+            "description": "Number of images to generate (1-4)",
+            "type": "number",
+            "default": 1,
+            "min": 1,
+            "max": 4,
+            "step": 1
+          },
+          {
+            "name": "seed",
+            "display_name": "Seed",
+            "description": "Seed for reproducibility (0 for random)",
+            "type": "number",
+            "default": 0,
+            "min": 0,
+            "max": 4294967295,
+            "step": 1,
+            "omit_if_empty": true
+          }
+        ],
+        "api_reference": "https://docs.leonardo.ai/reference/creategenerationv2"
       }
     ]
   },

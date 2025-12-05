@@ -21,6 +21,7 @@ const providerToCredentialKey: Record<string, string> = {
   openai: 'providerApiKeyOpenAI',
   google: 'providerApiKeyGemini',
   stability: 'providerApiKeyStability',
+  leonardo: 'providerApiKeyLeonardo',
 };
 
 export class DemetericsImage implements INodeType {
@@ -97,6 +98,19 @@ export class DemetericsImage implements INodeType {
         description: 'Stability AI model',
       },
       {
+        displayName: 'Model',
+        name: 'model',
+        type: 'options',
+        default: imageDefaultModels.leonardo || 'phoenix',
+        options: imageModelOptions.leonardo,
+        displayOptions: {
+          show: {
+            provider: ['leonardo'],
+          },
+        },
+        description: 'Leonardo AI model',
+      },
+      {
         displayName: 'Prompt',
         name: 'prompt',
         type: 'string',
@@ -157,6 +171,19 @@ export class DemetericsImage implements INodeType {
         description: 'Output image size',
       },
       {
+        displayName: 'Size',
+        name: 'size',
+        type: 'options',
+        default: '1024x1024',
+        options: imageSizeOptions.leonardo,
+        displayOptions: {
+          show: {
+            provider: ['leonardo'],
+          },
+        },
+        description: 'Output image size',
+      },
+      {
         displayName: 'Quality',
         name: 'quality',
         type: 'options',
@@ -168,6 +195,19 @@ export class DemetericsImage implements INodeType {
           },
         },
         description: 'Image quality (OpenAI gpt-image-1 only)',
+      },
+      {
+        displayName: 'Quality',
+        name: 'quality',
+        type: 'options',
+        default: 'standard',
+        options: imageQualityOptions.leonardo || [],
+        displayOptions: {
+          show: {
+            provider: ['leonardo'],
+          },
+        },
+        description: 'Quality mode (Leonardo Alchemy settings)',
       },
       {
         displayName: 'Number of Images',

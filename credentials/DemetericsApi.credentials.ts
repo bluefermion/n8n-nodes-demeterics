@@ -124,6 +124,17 @@ export class DemetericsApi implements ICredentialType {
 			displayOptions: { show: { byok: [true] } },
 		},
 		{
+			displayName: 'Leonardo AI API Key',
+			name: 'providerApiKeyLeonardo',
+			type: 'string',
+			typeOptions: { password: true },
+			default: '',
+			required: false,
+			placeholder: 'LEONARDO_API_KEY',
+			description: 'Used when routing image generation via Leonardo AI provider.',
+			displayOptions: { show: { byok: [true] } },
+		},
+		{
 			displayName: 'API Base URL',
 			name: 'baseUrl',
 			type: 'string',

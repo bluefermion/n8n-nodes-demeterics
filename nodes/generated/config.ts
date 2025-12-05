@@ -1,8 +1,8 @@
 /**
  * Auto-generated configuration from Demeterics API
- * Generated: 2025-12-04T20:18:23.421Z
+ * Generated: 2025-12-05T03:35:44.924Z
  * API Version: 1.0
- * API Updated: 2025-12-04T20:18:22Z
+ * API Updated: 2025-12-05T03:35:43Z
  * 
  * DO NOT EDIT MANUALLY - Run "npm run fetch-config" to regenerate
  * 
@@ -349,6 +349,7 @@ export const imageProviderOptions: INodePropertyOptions[] = [
   { name: 'OpenAI Image Generation', value: 'openai' },
   { name: 'Google Imagen', value: 'google' },
   { name: 'Stability AI', value: 'stability' },
+  { name: 'Leonardo AI', value: 'leonardo' },
 ];
 
 /**
@@ -564,18 +565,104 @@ export const imageProperties: INodeProperties[] = [
     displayOptions: { show: { provider: ['stability'] } },
     description: 'Seed for reproducibility (0 for random)',
   },
+  // --- Leonardo AI Parameters ---
+  {
+    displayName: 'Model',
+    name: 'model',
+    type: 'options',
+    default: 'phoenix',
+    required: true,
+    options: [
+      { name: 'Phoenix 1.0 (Flagship)', value: 'phoenix', description: 'Latest flagship model, best quality' },
+      { name: 'Kino XL (Cinematic)', value: 'kino-xl', description: 'Cinematic and dramatic style' },
+      { name: 'Vision XL (Photorealistic)', value: 'vision-xl', description: 'High-fidelity photorealistic images' },
+      { name: 'Diffusion XL (Versatile)', value: 'diffusion-xl', description: 'General purpose, versatile output' },
+      { name: 'Lightning XL (Fast)', value: 'lightning-xl', description: 'Fast generation, lower cost' },
+      { name: 'Anime XL (Anime)', value: 'anime-xl', description: 'Optimized for anime style' },
+    ],
+    displayOptions: { show: { provider: ['leonardo'] } },
+  },
+  {
+    displayName: 'Prompt',
+    name: 'prompt',
+    type: 'string',
+    default: '',
+    required: true,
+    typeOptions: { rows: 4 },
+    displayOptions: { show: { provider: ['leonardo'] } },
+    description: 'Description of the image to generate (max 1000 characters)',
+  },
+  {
+    displayName: 'Negative Prompt',
+    name: 'negativePrompt',
+    type: 'string',
+    default: '',
+    typeOptions: { rows: 2 },
+    displayOptions: { show: { provider: ['leonardo'] } },
+    description: 'What to avoid in the image',
+  },
+  {
+    displayName: 'Size',
+    name: 'size',
+    type: 'options',
+    default: '1024x1024',
+    options: [
+      { name: '1024x1024 (1:1 Square)', value: '1024x1024' },
+      { name: '1472x832 (16:9 Landscape)', value: '1472x832' },
+      { name: '832x1472 (9:16 Portrait)', value: '832x1472' },
+      { name: '1280x832 (3:2 Landscape)', value: '1280x832' },
+      { name: '832x1280 (2:3 Portrait)', value: '832x1280' },
+      { name: '1152x896 (4:3 Landscape)', value: '1152x896' },
+      { name: '896x1152 (3:4 Portrait)', value: '896x1152' },
+      { name: '512x512 (1:1 Small)', value: '512x512' },
+    ],
+    displayOptions: { show: { provider: ['leonardo'] } },
+  },
+  {
+    displayName: 'Quality',
+    name: 'quality',
+    type: 'options',
+    default: 'standard',
+    options: [
+      { name: 'Fast (No Alchemy)', value: 'fast', description: 'Fastest generation' },
+      { name: 'Standard (Alchemy v1)', value: 'standard', description: 'Balanced quality' },
+      { name: 'High (Alchemy v2)', value: 'high', description: 'Best quality enhancement' },
+    ],
+    displayOptions: { show: { provider: ['leonardo'] } },
+    description: 'Alchemy quality enhancement mode',
+  },
+  {
+    displayName: 'Number of Images',
+    name: 'n',
+    type: 'number',
+    default: 1,
+    typeOptions: { minValue: 1, maxValue: 4, numberStepSize: 1 },
+    displayOptions: { show: { provider: ['leonardo'] } },
+    description: 'Number of images to generate (1-4)',
+  },
+  {
+    displayName: 'Seed',
+    name: 'seed',
+    type: 'number',
+    default: 0,
+    typeOptions: { minValue: 0, maxValue: 4294967295, numberStepSize: 1 },
+    displayOptions: { show: { provider: ['leonardo'] } },
+    description: 'Seed for reproducibility (0 for random)',
+  },
 ];
 
 export const imageDefaultModels: Record<string, string> = {
   openai: 'gpt-image-1',
   google: 'imagen-4.0-generate-001',
   stability: 'core',
+  leonardo: 'phoenix',
 };
 
 export const imageProviderFeatures: Record<string, { supportsNegativePrompt: boolean; supportsQuality: boolean; supportsStyle: boolean; maxImages: number; maxPromptLen: number }> = {
   openai: { supportsNegativePrompt: false, supportsQuality: true, supportsStyle: false, maxImages: 4, maxPromptLen: 4000 },
   google: { supportsNegativePrompt: true, supportsQuality: false, supportsStyle: false, maxImages: 4, maxPromptLen: 5000 },
   stability: { supportsNegativePrompt: true, supportsQuality: false, supportsStyle: false, maxImages: 4, maxPromptLen: 10000 },
+  leonardo: { supportsNegativePrompt: true, supportsQuality: true, supportsStyle: false, maxImages: 4, maxPromptLen: 1000 },
 };
 
 export const imageNRange = { min: 1, max: 4, default: 1 };
@@ -745,6 +832,14 @@ export const imageModelOptions: Record<string, INodePropertyOptions[]> = {
     { name: 'SD3 Large', value: 'sd3-large' },
     { name: 'SD3 Medium', value: 'sd3-medium' },
   ],
+  leonardo: [
+    { name: 'Phoenix 1.0 (Flagship)', value: 'phoenix', description: 'Default' },
+    { name: 'Kino XL (Cinematic)', value: 'kino-xl' },
+    { name: 'Vision XL (Photorealistic)', value: 'vision-xl' },
+    { name: 'Diffusion XL (Versatile)', value: 'diffusion-xl' },
+    { name: 'Lightning XL (Fast)', value: 'lightning-xl' },
+    { name: 'Anime XL (Anime)', value: 'anime-xl' },
+  ],
 };
 
 export const imageSizeOptions: Record<string, INodePropertyOptions[]> = {
@@ -771,6 +866,16 @@ export const imageSizeOptions: Record<string, INodePropertyOptions[]> = {
     { name: '1536x640 (21:9 Ultra-wide)', value: '1536x640' },
     { name: '640x1536 (9:21 Ultra-tall)', value: '640x1536' },
   ],
+  leonardo: [
+    { name: '1024x1024 (1:1 Square)', value: '1024x1024' },
+    { name: '1472x832 (16:9 Landscape)', value: '1472x832' },
+    { name: '832x1472 (9:16 Portrait)', value: '832x1472' },
+    { name: '1280x832 (3:2 Landscape)', value: '1280x832' },
+    { name: '832x1280 (2:3 Portrait)', value: '832x1280' },
+    { name: '1152x896 (4:3 Landscape)', value: '1152x896' },
+    { name: '896x1152 (3:4 Portrait)', value: '896x1152' },
+    { name: '512x512 (1:1 Small)', value: '512x512' },
+  ],
 };
 
 export const imageQualityOptions: Record<string, INodePropertyOptions[]> = {
@@ -778,6 +883,11 @@ export const imageQualityOptions: Record<string, INodePropertyOptions[]> = {
     { name: 'Low (Fastest)', value: 'low' },
     { name: 'Medium (Balanced)', value: 'medium', description: 'Default' },
     { name: 'High (Best Quality)', value: 'high' },
+  ],
+  leonardo: [
+    { name: 'Fast (No Alchemy)', value: 'fast' },
+    { name: 'Standard (Alchemy v1)', value: 'standard', description: 'Default' },
+    { name: 'High (Alchemy v2)', value: 'high' },
   ],
 };
 
@@ -787,4 +897,4 @@ export const imageStyleOptions: Record<string, INodePropertyOptions[]> = {
 
 // Configuration metadata
 export const configVersion = '1.0';
-export const configUpdatedAt = '2025-12-04T20:18:22Z';
+export const configUpdatedAt = '2025-12-05T03:35:43Z';
