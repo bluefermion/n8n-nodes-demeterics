@@ -1,8 +1,8 @@
 /**
  * Auto-generated configuration from Demeterics API
- * Generated: 2025-12-05T16:19:28.886Z
+ * Generated: 2025-12-05T16:37:32.270Z
  * API Version: 1.0
- * API Updated: 2025-12-05T16:19:29Z
+ * API Updated: 2025-12-05T16:37:32Z
  * 
  * DO NOT EDIT MANUALLY - Run "npm run fetch-config" to regenerate
  * 
@@ -721,6 +721,7 @@ export const chatModelOptions: Record<string, INodePropertyOptions[]> = {
     { name: 'claude-haiku-4-5', value: 'anthropic/claude-haiku-4-5' },
     { name: 'claude-opus-4-1', value: 'anthropic/claude-opus-4-1' },
     { name: 'claude-opus-4-5', value: 'anthropic/claude-opus-4-5' },
+    { name: 'claude-opus-4-5-20251101', value: 'anthropic/claude-opus-4-5-20251101' },
     { name: 'claude-sonnet-4', value: 'anthropic/claude-sonnet-4' },
     { name: 'claude-sonnet-4-5', value: 'anthropic/claude-sonnet-4-5' },
   ],
@@ -941,4 +942,4 @@ export const imageStyleOptions: Record<string, INodePropertyOptions[]> = {
 
 // Configuration metadata
 export const configVersion = '1.0';
-export const configUpdatedAt = '2025-12-05T16:19:29Z';
+export const configUpdatedAt = '2025-12-05T16:37:32Z';

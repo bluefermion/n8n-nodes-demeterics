@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2025-12-05T16:19:29Z",
+  "updated_at": "2025-12-05T16:37:32Z",
   "tts": {
     "providers": [
       {
@@ -1549,6 +1549,16 @@
             "cached_per_1k": 0.0005,
             "enabled": true,
             "note": "API model ID: claude-opus-4-5-20251101 (alias: claude-opus-4-5)"
+          },
+          {
+            "id": "anthropic/claude-opus-4-5-20251101",
+            "display_name": "claude-opus-4-5-20251101",
+            "category": "chat",
+            "input_per_1k": 0.005,
+            "output_per_1k": 0.025,
+            "cached_per_1k": 0.0005,
+            "enabled": true,
+            "note": "Full model ID for claude-opus-4-5"
           },
           {
             "id": "anthropic/claude-sonnet-4",
