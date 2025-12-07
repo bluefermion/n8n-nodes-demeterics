@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2025-12-07T01:28:21Z",
+  "updated_at": "2025-12-07T02:28:46Z",
   "tts": {
     "providers": [
       {
@@ -1616,6 +1616,16 @@
             "output_per_1k": 0.03,
             "enabled": true,
             "note": "Gemini 2.5 Flash Image (Nano Banana) - native image generation via generateContent"
+          },
+          {
+            "id": "gemini-3-pro-image-preview",
+            "display_name": "gemini-3-pro-image-preview",
+            "category": "image",
+            "input_per_1k": 0.002,
+            "output_per_1k": 0.134,
+            "cached_per_1k": 0.0002,
+            "enabled": true,
+            "note": "Gemini 3 Pro Image Preview (Nano Banana Pro) - advanced image generation with 4K, grounding, and reasoning"
           },
           {
             "id": "google/gemini-1.5-flash",
