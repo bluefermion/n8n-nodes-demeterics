@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2025-12-05T16:37:32Z",
+  "updated_at": "2025-12-07T01:28:21Z",
   "tts": {
     "providers": [
       {
@@ -670,13 +670,18 @@
             "display_name": "Model",
             "type": "options",
             "required": true,
-            "default": "imagen-4.0-generate-001",
+            "default": "gemini-2.5-flash-image",
             "options": [
               {
-                "value": "imagen-4.0-generate-001",
-                "label": "Imagen 4.0 (Latest)",
-                "description": "Latest generation model",
+                "value": "gemini-2.5-flash-image",
+                "label": "Gemini 2.5 Flash Image (Nano Banana)",
+                "description": "Native Gemini image generation - fast, high quality",
                 "default": true
+              },
+              {
+                "value": "imagen-4.0-generate-001",
+                "label": "Imagen 4.0",
+                "description": "Vertex AI Imagen 4.0 model"
               },
               {
                 "value": "imagen-3.0-generate-002",
@@ -1531,6 +1536,16 @@
             "note": "API model ID: claude-haiku-4-5-20251001"
           },
           {
+            "id": "anthropic/claude-haiku-4-5-20250514",
+            "display_name": "claude-haiku-4-5-20250514",
+            "category": "chat",
+            "input_per_1k": 0.001,
+            "output_per_1k": 0.005,
+            "cached_per_1k": 0.0001,
+            "enabled": true,
+            "note": "Claude Haiku 4.5 May 2025 release"
+          },
+          {
             "id": "anthropic/claude-opus-4-1",
             "display_name": "claude-opus-4-1",
             "category": "chat",
@@ -1593,6 +1608,15 @@
         "display_name": "Google AI",
         "base_url": "https://api.demeterics.com/google/v1",
         "models": [
+          {
+            "id": "gemini-2.5-flash-image",
+            "display_name": "gemini-2.5-flash-image",
+            "category": "image",
+            "input_per_1k": 0,
+            "output_per_1k": 0.03,
+            "enabled": true,
+            "note": "Gemini 2.5 Flash Image (Nano Banana) - native image generation via generateContent"
+          },
           {
             "id": "google/gemini-1.5-flash",
             "display_name": "gemini-1.5-flash",

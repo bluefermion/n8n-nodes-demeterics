@@ -1,8 +1,8 @@
 /**
  * Auto-generated configuration from Demeterics API
- * Generated: 2025-12-05T16:37:32.270Z
+ * Generated: 2025-12-07T01:28:42.499Z
  * API Version: 1.0
- * API Updated: 2025-12-05T16:37:32Z
+ * API Updated: 2025-12-07T01:28:21Z
  * 
  * DO NOT EDIT MANUALLY - Run "npm run fetch-config" to regenerate
  * 
@@ -436,10 +436,11 @@ export const imageProperties: INodeProperties[] = [
     displayName: 'Model',
     name: 'model',
     type: 'options',
-    default: 'imagen-4.0-generate-001',
+    default: 'gemini-2.5-flash-image',
     required: true,
     options: [
-      { name: 'Imagen 4.0 (Latest)', value: 'imagen-4.0-generate-001', description: 'Latest generation model' },
+      { name: 'Gemini 2.5 Flash Image (Nano Banana)', value: 'gemini-2.5-flash-image', description: 'Native Gemini image generation - fast, high quality' },
+      { name: 'Imagen 4.0', value: 'imagen-4.0-generate-001', description: 'Vertex AI Imagen 4.0 model' },
       { name: 'Imagen 3.0 Generate', value: 'imagen-3.0-generate-002', description: 'Previous generation model' },
       { name: 'Imagen 3.0 Fast', value: 'imagen-3.0-fast-generate-001', description: 'Faster generation, slightly lower quality' },
     ],
@@ -653,7 +654,7 @@ export const imageProperties: INodeProperties[] = [
 
 export const imageDefaultModels: Record<string, string> = {
   openai: 'gpt-image-1',
-  google: 'imagen-4.0-generate-001',
+  google: 'gemini-2.5-flash-image',
   stability: 'core',
   leonardo: 'phoenix',
 };
@@ -719,6 +720,7 @@ export const chatModelOptions: Record<string, INodePropertyOptions[]> = {
     { name: 'claude-3-haiku-20240307', value: 'anthropic/claude-3-haiku-20240307' },
     { name: 'claude-3-opus-20240229', value: 'anthropic/claude-3-opus-20240229' },
     { name: 'claude-haiku-4-5', value: 'anthropic/claude-haiku-4-5' },
+    { name: 'claude-haiku-4-5-20250514', value: 'anthropic/claude-haiku-4-5-20250514' },
     { name: 'claude-opus-4-1', value: 'anthropic/claude-opus-4-1' },
     { name: 'claude-opus-4-5', value: 'anthropic/claude-opus-4-5' },
     { name: 'claude-opus-4-5-20251101', value: 'anthropic/claude-opus-4-5-20251101' },
@@ -867,7 +869,8 @@ export const imageModelOptions: Record<string, INodePropertyOptions[]> = {
     { name: 'GPT Image 1 Mini (~70% cheaper)', value: 'gpt-image-1-mini' },
   ],
   google: [
-    { name: 'Imagen 4.0 (Latest)', value: 'imagen-4.0-generate-001', description: 'Default' },
+    { name: 'Gemini 2.5 Flash Image (Nano Banana)', value: 'gemini-2.5-flash-image', description: 'Default' },
+    { name: 'Imagen 4.0', value: 'imagen-4.0-generate-001' },
     { name: 'Imagen 3.0 Generate', value: 'imagen-3.0-generate-002' },
     { name: 'Imagen 3.0 Fast', value: 'imagen-3.0-fast-generate-001' },
   ],
@@ -942,4 +945,4 @@ export const imageStyleOptions: Record<string, INodePropertyOptions[]> = {
 
 // Configuration metadata
 export const configVersion = '1.0';
-export const configUpdatedAt = '2025-12-05T16:37:32Z';
+export const configUpdatedAt = '2025-12-07T01:28:21Z';
