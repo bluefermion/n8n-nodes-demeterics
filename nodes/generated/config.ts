@@ -1,8 +1,8 @@
 /**
  * Auto-generated configuration from Demeterics API
- * Generated: 2025-12-08T16:09:34.026Z
+ * Generated: 2025-12-08T20:49:05.952Z
  * API Version: 1.0
- * API Updated: 2025-12-08T16:09:34Z
+ * API Updated: 2025-12-08T20:49:06Z
  * 
  * DO NOT EDIT MANUALLY - Run "npm run fetch-config" to regenerate
  * 
@@ -684,60 +684,14 @@ export const chatProviderOptions: INodePropertyOptions[] = [
 
 export const chatModelOptions: Record<string, INodePropertyOptions[]> = {
   groq: [
-    { name: 'allam-2-7b', value: 'allam-2-7b' },
-    { name: 'compound', value: 'groq/compound' },
-    { name: 'compound-mini', value: 'groq/compound-mini' },
-    { name: 'llama-3.1-8b-instant', value: 'llama-3.1-8b-instant' },
-    { name: 'llama-3.3-70b-versatile', value: 'llama-3.3-70b-versatile' },
-    { name: 'llama-4-maverick-17b-128e-instruct', value: 'meta-llama/llama-4-maverick-17b-128e-instruct' },
-    { name: 'llama-4-scout-17b-16e-instruct', value: 'meta-llama/llama-4-scout-17b-16e-instruct' },
-    { name: 'kimi-k2-instruct', value: 'moonshotai/kimi-k2-instruct' },
-    { name: 'kimi-k2-instruct-0905', value: 'moonshotai/kimi-k2-instruct-0905' },
-    { name: 'gpt-oss-120b', value: 'openai/gpt-oss-120b' },
-    { name: 'gpt-oss-20b', value: 'openai/gpt-oss-20b' },
-    { name: 'qwen3-32b', value: 'qwen/qwen3-32b' },
   ],
   openai: [
-    { name: 'gpt-3.5-turbo', value: 'openai/gpt-3.5-turbo' },
-    { name: 'gpt-4-turbo', value: 'openai/gpt-4-turbo' },
-    { name: 'gpt-4.1', value: 'openai/gpt-4.1' },
-    { name: 'gpt-4.1-mini', value: 'openai/gpt-4.1-mini' },
-    { name: 'gpt-4.1-nano', value: 'openai/gpt-4.1-nano' },
-    { name: 'gpt-4o', value: 'openai/gpt-4o' },
-    { name: 'gpt-4o-mini', value: 'openai/gpt-4o-mini' },
-    { name: 'gpt-4o-mini-search-preview', value: 'openai/gpt-4o-mini-search-preview' },
-    { name: 'gpt-4o-search-preview', value: 'openai/gpt-4o-search-preview' },
-    { name: 'gpt-5', value: 'openai/gpt-5' },
-    { name: 'gpt-5-chat-latest', value: 'openai/gpt-5-chat-latest' },
-    { name: 'gpt-5-mini', value: 'openai/gpt-5-mini' },
-    { name: 'gpt-5-nano', value: 'openai/gpt-5-nano' },
-    { name: 'gpt-5-search-api', value: 'openai/gpt-5-search-api' },
   ],
   anthropic: [
-    { name: 'claude-3-5-haiku-20241022', value: 'anthropic/claude-3-5-haiku-20241022' },
-    { name: 'claude-3-5-sonnet-20241022', value: 'anthropic/claude-3-5-sonnet-20241022' },
-    { name: 'claude-3-7-sonnet', value: 'anthropic/claude-3-7-sonnet' },
-    { name: 'claude-3-haiku-20240307', value: 'anthropic/claude-3-haiku-20240307' },
-    { name: 'claude-3-opus-20240229', value: 'anthropic/claude-3-opus-20240229' },
-    { name: 'claude-haiku-4-5', value: 'anthropic/claude-haiku-4-5' },
-    { name: 'claude-haiku-4-5-20250514', value: 'anthropic/claude-haiku-4-5-20250514' },
-    { name: 'claude-opus-4-1', value: 'anthropic/claude-opus-4-1' },
-    { name: 'claude-opus-4-5', value: 'anthropic/claude-opus-4-5' },
-    { name: 'claude-opus-4-5-20251101', value: 'anthropic/claude-opus-4-5-20251101' },
-    { name: 'claude-sonnet-4', value: 'anthropic/claude-sonnet-4' },
-    { name: 'claude-sonnet-4-5', value: 'anthropic/claude-sonnet-4-5' },
   ],
   gemini: [
   ],
   google: [
-    { name: 'gemini-1.5-flash', value: 'google/gemini-1.5-flash' },
-    { name: 'gemini-1.5-pro', value: 'google/gemini-1.5-pro' },
-    { name: 'gemini-2.0-flash', value: 'google/gemini-2.0-flash' },
-    { name: 'gemini-2.0-flash-lite', value: 'google/gemini-2.0-flash-lite' },
-    { name: 'gemini-2.5-flash', value: 'google/gemini-2.5-flash' },
-    { name: 'gemini-2.5-flash-lite', value: 'google/gemini-2.5-flash-lite' },
-    { name: 'gemini-2.5-pro', value: 'google/gemini-2.5-pro' },
-    { name: 'gemini-3-pro-preview', value: 'google/gemini-3-pro-preview' },
   ],
   openrouter: [
   ],
@@ -945,4 +899,4 @@ export const imageStyleOptions: Record<string, INodePropertyOptions[]> = {
 
 // Configuration metadata
 export const configVersion = '1.0';
-export const configUpdatedAt = '2025-12-08T16:09:34Z';
+export const configUpdatedAt = '2025-12-08T20:49:06Z';

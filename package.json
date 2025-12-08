@@ -25,7 +25,12 @@
     "dall-e",
     "imagen",
     "stability-ai",
-    "elevenlabs"
+    "elevenlabs",
+    "council",
+    "multi-persona",
+    "evaluation",
+    "content-evaluation",
+    "audience-feedback"
   ],
   "license": "MIT",
   "homepage": "https://demeterics.com",
@@ -72,7 +77,8 @@
       "dist/nodes/DemetericsCohort/DemetericsCohort.node.js",
       "dist/nodes/DemetericsExtract/DemetericsExtract.node.js",
       "dist/nodes/DemetericsSpeech/DemetericsSpeech.node.js",
-      "dist/nodes/DemetericsImage/DemetericsImage.node.js"
+      "dist/nodes/DemetericsImage/DemetericsImage.node.js",
+      "dist/nodes/DemetericsCouncil/DemetericsCouncil.node.js"
     ]
   },
   "devDependencies": {
