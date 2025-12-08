@@ -1,4 +1,4 @@
-.PHONY: install build dev lint lintfix format clean check publish help pack install-local uninstall-local install-custom uninstall-custom cli-build cli-install prepare verify version bump package package-lite package-full wait-publish wait-publish-pkg build-variants fetch-config
+.PHONY: deps install build dev lint lintfix format clean check publish help pack install-local uninstall-local install-custom uninstall-custom cli-build cli-install prepare verify version bump package package-lite package-full wait-publish wait-publish-pkg build-variants fetch-config
 
 # Default n8n user folder (override with: make install-custom DIR=/your/path)
 DIR ?= /opt/n8n/n8n_data
@@ -7,7 +7,7 @@ DIR ?= /opt/n8n/n8n_data
 PM := $(shell command -v pnpm >/dev/null 2>&1 && echo pnpm || echo npm)
 
 # Install dependencies
-install:
+deps:
 	$(PM) install
 
 # Fetch configuration from Demeterics API and generate TypeScript
@@ -19,8 +19,8 @@ fetch-config:
 
 # Prefer the official n8n-node CLI when available
 # Falls back to the existing TypeScript + gulp build
-# NOTE: fetch-config runs first to ensure generated config is up-to-date
-build: fetch-config cli-build
+# NOTE: deps + fetch-config run first to ensure dependencies and generated config are up-to-date
+build: deps fetch-config cli-build
 
 # Use n8n-node CLI if present, otherwise try via npx, else fallback
 cli-build:
@@ -79,7 +79,7 @@ pack: build
 	@TARBALL=$$(npm pack | tail -n1); \
 	 echo "Created $$TARBALL";
 
-# Default install to custom path
+# Default install target (installs to custom path)
 install: install-custom
 
 # Install into a local n8n user folder (default DIR=/opt/n8n)
