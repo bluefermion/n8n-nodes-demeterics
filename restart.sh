@@ -48,6 +48,9 @@ else
   echo "[demeterics] Not a git repository — skipping git pull"
 fi
 
+echo "[demeterics] Install latest package"
+pnpm install
+
 echo "[demeterics] Building and installing into: ${DIR}/custom"
 make install-custom DIR="${DIR}"
 
