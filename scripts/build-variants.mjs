@@ -27,7 +27,9 @@ const LANGCHAIN_NODES = [
 
 // Dependencies that are not allowed in lite version
 const LANGCHAIN_DEPENDENCIES = [
-  '@langchain/openai'
+  '@langchain/openai',
+  '@langchain/anthropic',
+  '@langchain/core'
 ];
 
 // Keywords to remove from lite version

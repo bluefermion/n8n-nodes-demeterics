@@ -11,7 +11,7 @@ import type {
 import { NodeConnectionTypes } from 'n8n-workflow';
 
 import { getValidatedBaseUrl } from '../utils/security';
-import { N8nLlmTracing } from '../utils/N8nLlmTracing';
+import { N8nLlmTracing } from './N8nLlmTracing';
 
 // Provider options for the dropdown.
 const providerOptions: INodePropertyOptions[] = [
