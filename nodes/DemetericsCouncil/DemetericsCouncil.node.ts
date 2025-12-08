@@ -213,17 +213,77 @@ export class DemetericsCouncil implements INodeType {
 
         returnData.push(outputData);
       } catch (error) {
+        // Extract detailed error information from axios/HTTP errors
+        let errorMessage = 'Unknown error';
+        let statusCode: number | undefined;
+        let apiError: Record<string, unknown> | undefined;
+        const requestUrl = `${baseUrl}/council/v1/evaluate`;
+
+        if (error instanceof Error) {
+          errorMessage = error.message;
+
+          // Check for axios-style error with response data
+          const axiosError = error as Error & {
+            response?: {
+              status?: number;
+              data?: unknown;
+            };
+            statusCode?: number;
+          };
+
+          if (axiosError.response) {
+            statusCode = axiosError.response.status;
+            const responseData = axiosError.response.data;
+
+            // Try to extract API error message
+            if (responseData && typeof responseData === 'object') {
+              const data = responseData as Record<string, unknown>;
+              if (data.error && typeof data.error === 'object') {
+                apiError = data.error as Record<string, unknown>;
+                const apiMessage = (apiError.message as string) || (apiError.type as string);
+                if (apiMessage) {
+                  errorMessage = `API Error: ${apiMessage}`;
+                }
+              } else if (data.message) {
+                errorMessage = `API Error: ${data.message}`;
+              }
+            }
+          } else if (axiosError.statusCode) {
+            statusCode = axiosError.statusCode;
+          }
+        }
+
+        // Build hint based on status code
+        let hint = '';
+        if (statusCode === 404) {
+          hint = 'The Council API endpoint was not found. Please ensure the API is deployed and the base URL is correct.';
+        } else if (statusCode === 401) {
+          hint = 'Authentication failed. Please check your Demeterics API key.';
+        } else if (statusCode === 402) {
+          hint = 'Insufficient credits. Please add credits to your account.';
+        } else if (statusCode === 400) {
+          hint = 'Invalid request. Check your question and content parameters.';
+        }
+
         if (this.continueOnFail()) {
-          const errorMessage = error instanceof Error ? error.message : String(error);
           returnData.push({
             json: {
               error: errorMessage,
+              request_url: requestUrl,
+              status_code: statusCode || null,
+              hint: hint || null,
+              api_error: apiError || null,
             },
             pairedItem: { item: i },
           });
           continue;
         }
-        throw error;
+
+        // For non-continue mode, throw a more descriptive error
+        const detailedMessage = statusCode
+          ? `Council API request failed (HTTP ${statusCode}): ${errorMessage}`
+          : `Council API request failed: ${errorMessage}`;
+        throw new Error(detailedMessage);
       }
     }
 
