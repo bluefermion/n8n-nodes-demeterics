@@ -279,10 +279,20 @@ export class DemetericsCouncil implements INodeType {
           continue;
         }
 
-        // For non-continue mode, throw a more descriptive error
-        const detailedMessage = statusCode
+        // For non-continue mode, throw a more descriptive error with full context
+        let detailedMessage = statusCode
           ? `Council API request failed (HTTP ${statusCode}): ${errorMessage}`
           : `Council API request failed: ${errorMessage}`;
+
+        // Always include URL and hint in the error message
+        detailedMessage += `\n\nRequest URL: ${requestUrl}`;
+        if (hint) {
+          detailedMessage += `\nHint: ${hint}`;
+        }
+        if (apiError) {
+          detailedMessage += `\nAPI Error Details: ${JSON.stringify(apiError)}`;
+        }
+
         throw new Error(detailedMessage);
       }
     }
