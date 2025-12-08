@@ -103,12 +103,12 @@ export class DemetericsCouncil implements INodeType {
             displayName: 'Max Tokens',
             name: 'maxTokens',
             type: 'number',
-            default: 500,
+            default: 8000,
             typeOptions: {
               minValue: 50,
-              maxValue: 4096,
+              maxValue: 16000,
             },
-            description: 'Maximum tokens per persona response (50-4096)',
+            description: 'Maximum tokens per persona response (50-16000)',
           },
           {
             displayName: 'Include Raw Responses',
