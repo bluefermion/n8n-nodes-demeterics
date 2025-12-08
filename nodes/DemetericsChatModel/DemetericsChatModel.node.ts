@@ -11,6 +11,7 @@ import type {
 import { NodeConnectionTypes } from 'n8n-workflow';
 
 import { getValidatedBaseUrl } from '../utils/security';
+import { N8nLlmTracing } from '../utils/N8nLlmTracing';
 
 // Provider options for the dropdown.
 const providerOptions: INodePropertyOptions[] = [
@@ -212,6 +213,9 @@ export class DemetericsChatModel implements INodeType {
     const vendorKey = vendorKeyField ? ((credentials as Record<string, unknown>)[vendorKeyField] as string) || '' : '';
     const apiKey = byok && vendorKey ? `${demetericsKey};${vendorKey}` : demetericsKey;
 
+    // Create the tracing callback for execution tracking in n8n UI
+    const tracingCallback = new N8nLlmTracing(this);
+
     // Use ChatAnthropic for Anthropic provider to get native Anthropic API format
     if (provider === 'anthropic') {
       const chatModel = new ChatAnthropic({
@@ -221,6 +225,7 @@ export class DemetericsChatModel implements INodeType {
         temperature: options.temperature ?? 0.7,
         maxTokens: options.maxTokens ?? 4096,
         topP: options.topP ?? 1,
+        callbacks: [tracingCallback],
       });
 
       return { response: chatModel };
@@ -239,6 +244,7 @@ export class DemetericsChatModel implements INodeType {
       configuration: {
         basePath: `${baseUrl.replace(/\/$/, '')}/${providerBase}/v1`,
       },
+      callbacks: [tracingCallback],
     });
 
     return { response: chatModel };

@@ -1,8 +1,8 @@
 /**
  * Auto-generated configuration from Demeterics API
- * Generated: 2025-12-07T02:28:46.739Z
+ * Generated: 2025-12-08T16:09:34.026Z
  * API Version: 1.0
- * API Updated: 2025-12-07T02:28:46Z
+ * API Updated: 2025-12-08T16:09:34Z
  * 
  * DO NOT EDIT MANUALLY - Run "npm run fetch-config" to regenerate
  * 
@@ -945,4 +945,4 @@ export const imageStyleOptions: Record<string, INodePropertyOptions[]> = {
 
 // Configuration metadata
 export const configVersion = '1.0';
-export const configUpdatedAt = '2025-12-07T02:28:46Z';
+export const configUpdatedAt = '2025-12-08T16:09:34Z';
