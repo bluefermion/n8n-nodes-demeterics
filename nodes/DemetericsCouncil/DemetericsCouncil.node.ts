@@ -189,27 +189,44 @@ export class DemetericsCouncil implements INodeType {
           body,
         });
 
-        // Build output data
-        const outputData: INodeExecutionData = {
-          json: {
-            id: response.id,
-            score: response.score,
-            summary: response.summary,
-            stats: response.stats,
-            usage: response.usage,
-          },
-          pairedItem: { item: i },
+        // Build output data with all response fields
+        const outputJson: Record<string, unknown> = {
+          id: response.id,
+          score: response.score,
+          summary: response.summary,
+          usage: response.usage,
         };
 
-        // Include persona responses if available
+        // Include stats with voting breakdown if available
+        if (response.stats) {
+          outputJson.stats = response.stats;
+
+          // Promote voting results to top level for easy access
+          if (response.stats.majority_vote) {
+            outputJson.majority_vote = response.stats.majority_vote;
+          }
+          if (response.stats.vote_consensus) {
+            outputJson.vote_consensus = response.stats.vote_consensus;
+          }
+          if (response.stats.vote_breakdown) {
+            outputJson.vote_breakdown = response.stats.vote_breakdown;
+          }
+        }
+
+        // Include persona responses if available (contains individual votes)
         if (response.persona_responses) {
-          (outputData.json as Record<string, unknown>).persona_responses = response.persona_responses;
+          outputJson.persona_responses = response.persona_responses;
         }
 
         // Include error if present
         if (response.error) {
-          (outputData.json as Record<string, unknown>).error = response.error;
+          outputJson.error = response.error;
         }
+
+        const outputData: INodeExecutionData = {
+          json: outputJson as INodeExecutionData['json'],
+          pairedItem: { item: i },
+        };
 
         returnData.push(outputData);
       } catch (error) {

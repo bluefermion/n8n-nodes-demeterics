@@ -18,6 +18,7 @@ import type { INodePropertyOptions, INodeProperties } from 'n8n-workflow';
 // =============================================================================
 
 export const ttsProviderOptions: INodePropertyOptions[] = [
+  { name: 'Groq Orpheus (Fast & Cheap)', value: 'groq' },
   { name: 'OpenAI TTS', value: 'openai' },
   { name: 'ElevenLabs', value: 'elevenlabs' },
   { name: 'Google Cloud TTS', value: 'google' },
@@ -33,9 +34,60 @@ export const ttsProperties: INodeProperties[] = [
     displayName: 'Provider',
     name: 'provider',
     type: 'options',
-    default: 'openai',
+    default: 'groq',
     options: ttsProviderOptions,
     description: 'Select the TTS provider',
+  },
+  // --- Groq Orpheus TTS Parameters ---
+  {
+    displayName: 'Model',
+    name: 'model',
+    type: 'options',
+    default: 'playai-tts',
+    required: true,
+    options: [
+      { name: 'PlayAI TTS (Orpheus)', value: 'playai-tts', description: 'High quality Orpheus voices' },
+    ],
+    displayOptions: { show: { provider: ['groq'] } },
+  },
+  {
+    displayName: 'Voice',
+    name: 'voice',
+    type: 'options',
+    default: 'tara',
+    required: true,
+    options: [
+      { name: 'Tara (Conversational Female)', value: 'tara' },
+      { name: 'Leah (Female)', value: 'leah' },
+      { name: 'Jess (Female)', value: 'jess' },
+      { name: 'Mia (Female)', value: 'mia' },
+      { name: 'Zoe (Female)', value: 'zoe' },
+      { name: 'Leo (Male)', value: 'leo' },
+      { name: 'Dan (Male)', value: 'dan' },
+      { name: 'Zac (Male)', value: 'zac' },
+    ],
+    displayOptions: { show: { provider: ['groq'] } },
+  },
+  {
+    displayName: 'Text',
+    name: 'text',
+    type: 'string',
+    default: '',
+    required: true,
+    typeOptions: { rows: 4 },
+    displayOptions: { show: { provider: ['groq'] } },
+    description: 'Text to convert to speech',
+  },
+  {
+    displayName: 'Output Format',
+    name: 'format',
+    type: 'options',
+    default: 'wav',
+    options: [
+      { name: 'WAV', value: 'wav' },
+    ],
+    displayOptions: { show: { provider: ['groq'] } },
+    description: 'Groq Orpheus only supports WAV format',
   },
   // --- OpenAI TTS Parameters ---
   {
@@ -319,6 +371,7 @@ export const ttsProperties: INodeProperties[] = [
 ];
 
 export const ttsDefaultModels: Record<string, string> = {
+  groq: 'playai-tts',
   openai: 'gpt-4o-mini-tts',
   elevenlabs: 'eleven_multilingual_v2',
   google: 'Neural2',
@@ -326,6 +379,7 @@ export const ttsDefaultModels: Record<string, string> = {
 };
 
 export const ttsDefaultVoices: Record<string, string> = {
+  groq: 'tara',
   openai: 'alloy',
   elevenlabs: '21m00Tcm4TlvDq8ikWAM',
   google: 'en-US-Neural2-A',
@@ -333,6 +387,7 @@ export const ttsDefaultVoices: Record<string, string> = {
 };
 
 export const ttsProviderFeatures: Record<string, { maxChars: number; supportsSpeed: boolean; supportsLanguage: boolean; supportsInstructions: boolean }> = {
+  groq: { maxChars: 10000, supportsSpeed: false, supportsLanguage: false, supportsInstructions: false },
   openai: { maxChars: 4096, supportsSpeed: true, supportsLanguage: false, supportsInstructions: true },
   elevenlabs: { maxChars: 5000, supportsSpeed: false, supportsLanguage: false, supportsInstructions: false },
   google: { maxChars: 5000, supportsSpeed: true, supportsLanguage: false, supportsInstructions: false },
@@ -711,6 +766,9 @@ export const chatProviderBaseUrls: Record<string, string> = {
 // =============================================================================
 
 export const ttsModelOptions: Record<string, INodePropertyOptions[]> = {
+  groq: [
+    { name: 'PlayAI TTS (Orpheus)', value: 'playai-tts', description: 'Default' },
+  ],
   openai: [
     { name: 'GPT-4o Mini TTS (Latest)', value: 'gpt-4o-mini-tts', description: 'Default' },
     { name: 'TTS-1 (Standard)', value: 'tts-1' },
@@ -734,6 +792,16 @@ export const ttsModelOptions: Record<string, INodePropertyOptions[]> = {
 };
 
 export const ttsVoiceOptions: Record<string, INodePropertyOptions[]> = {
+  groq: [
+    { name: 'Tara (Conversational Female)', value: 'tara', description: 'Default' },
+    { name: 'Leah (Female)', value: 'leah' },
+    { name: 'Jess (Female)', value: 'jess' },
+    { name: 'Mia (Female)', value: 'mia' },
+    { name: 'Zoe (Female)', value: 'zoe' },
+    { name: 'Leo (Male)', value: 'leo' },
+    { name: 'Dan (Male)', value: 'dan' },
+    { name: 'Zac (Male)', value: 'zac' },
+  ],
   openai: [
     { name: 'Alloy (Neutral)', value: 'alloy', description: 'Default' },
     { name: 'Ash (Warm Male)', value: 'ash' },
@@ -783,6 +851,9 @@ export const ttsVoiceOptions: Record<string, INodePropertyOptions[]> = {
 };
 
 export const ttsFormatOptions: Record<string, INodePropertyOptions[]> = {
+  groq: [
+    { name: 'WAV', value: 'wav' },
+  ],
   openai: [
     { name: 'MP3', value: 'mp3' },
     { name: 'Opus', value: 'opus' },

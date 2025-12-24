@@ -21,6 +21,7 @@ import {
 
 // Map provider to credential field names for BYOK.
 const providerToCredentialKey: Record<string, string> = {
+  groq: 'providerApiKeyGroq',
   openai: 'providerApiKeyOpenAI',
   elevenlabs: 'providerApiKeyElevenLabs',
   google: 'providerApiKeyGemini',
@@ -57,11 +58,24 @@ export class DemetericsSpeech implements INodeType {
         displayName: 'Provider',
         name: 'provider',
         type: 'options',
-        default: 'openai',
+        default: 'groq',
         options: ttsProviderOptions,
         description: 'Select the TTS provider',
       },
       // Model options per provider
+      {
+        displayName: 'Model',
+        name: 'model',
+        type: 'options',
+        default: ttsDefaultModels.groq || 'playai-tts',
+        options: ttsModelOptions.groq,
+        displayOptions: {
+          show: {
+            provider: ['groq'],
+          },
+        },
+        description: 'Groq Orpheus TTS model',
+      },
       {
         displayName: 'Model',
         name: 'model',
@@ -115,6 +129,19 @@ export class DemetericsSpeech implements INodeType {
         description: 'Murf.ai TTS model',
       },
       // Voice options per provider
+      {
+        displayName: 'Voice',
+        name: 'voice',
+        type: 'options',
+        default: ttsDefaultVoices.groq || 'tara',
+        options: ttsVoiceOptions.groq,
+        displayOptions: {
+          show: {
+            provider: ['groq'],
+          },
+        },
+        description: 'Voice to use for speech generation',
+      },
       {
         displayName: 'Voice',
         name: 'voice',
@@ -179,6 +206,19 @@ export class DemetericsSpeech implements INodeType {
         description: 'Text to convert to speech (max varies by provider: OpenAI 4096, ElevenLabs 5000, Google 5000, Murf 10000)',
       },
       // Format options per provider
+      {
+        displayName: 'Output Format',
+        name: 'format',
+        type: 'options',
+        default: 'wav',
+        options: ttsFormatOptions.groq || [],
+        displayOptions: {
+          show: {
+            provider: ['groq'],
+          },
+        },
+        description: 'Audio output format (Groq Orpheus only supports WAV)',
+      },
       {
         displayName: 'Output Format',
         name: 'format',
