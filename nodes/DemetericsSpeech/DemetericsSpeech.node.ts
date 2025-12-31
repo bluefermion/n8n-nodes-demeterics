@@ -58,7 +58,7 @@ export class DemetericsSpeech implements INodeType {
         displayName: 'Provider',
         name: 'provider',
         type: 'options',
-        default: 'groq',
+        default: 'openai',
         options: ttsProviderOptions,
         description: 'Select the TTS provider',
       },
