@@ -1,8 +1,8 @@
 /**
  * Auto-generated configuration from Demeterics API
- * Generated: 2025-12-17T05:08:22.193Z
+ * Generated: 2025-12-31T07:11:01.239Z
  * API Version: 1.0
- * API Updated: 2025-12-17T05:08:21Z
+ * API Updated: 2025-12-31T07:11:01Z
  * 
  * DO NOT EDIT MANUALLY - Run "npm run fetch-config" to regenerate
  * 
@@ -18,7 +18,6 @@ import type { INodePropertyOptions, INodeProperties } from 'n8n-workflow';
 // =============================================================================
 
 export const ttsProviderOptions: INodePropertyOptions[] = [
-  { name: 'Groq Orpheus (Fast & Cheap)', value: 'groq' },
   { name: 'OpenAI TTS', value: 'openai' },
   { name: 'ElevenLabs', value: 'elevenlabs' },
   { name: 'Google Cloud TTS', value: 'google' },
@@ -34,60 +33,9 @@ export const ttsProperties: INodeProperties[] = [
     displayName: 'Provider',
     name: 'provider',
     type: 'options',
-    default: 'groq',
+    default: 'openai',
     options: ttsProviderOptions,
     description: 'Select the TTS provider',
-  },
-  // --- Groq Orpheus TTS Parameters ---
-  {
-    displayName: 'Model',
-    name: 'model',
-    type: 'options',
-    default: 'playai-tts',
-    required: true,
-    options: [
-      { name: 'PlayAI TTS (Orpheus)', value: 'playai-tts', description: 'High quality Orpheus voices' },
-    ],
-    displayOptions: { show: { provider: ['groq'] } },
-  },
-  {
-    displayName: 'Voice',
-    name: 'voice',
-    type: 'options',
-    default: 'tara',
-    required: true,
-    options: [
-      { name: 'Tara (Conversational Female)', value: 'tara' },
-      { name: 'Leah (Female)', value: 'leah' },
-      { name: 'Jess (Female)', value: 'jess' },
-      { name: 'Mia (Female)', value: 'mia' },
-      { name: 'Zoe (Female)', value: 'zoe' },
-      { name: 'Leo (Male)', value: 'leo' },
-      { name: 'Dan (Male)', value: 'dan' },
-      { name: 'Zac (Male)', value: 'zac' },
-    ],
-    displayOptions: { show: { provider: ['groq'] } },
-  },
-  {
-    displayName: 'Text',
-    name: 'text',
-    type: 'string',
-    default: '',
-    required: true,
-    typeOptions: { rows: 4 },
-    displayOptions: { show: { provider: ['groq'] } },
-    description: 'Text to convert to speech',
-  },
-  {
-    displayName: 'Output Format',
-    name: 'format',
-    type: 'options',
-    default: 'wav',
-    options: [
-      { name: 'WAV', value: 'wav' },
-    ],
-    displayOptions: { show: { provider: ['groq'] } },
-    description: 'Groq Orpheus only supports WAV format',
   },
   // --- OpenAI TTS Parameters ---
   {
@@ -371,7 +319,6 @@ export const ttsProperties: INodeProperties[] = [
 ];
 
 export const ttsDefaultModels: Record<string, string> = {
-  groq: 'playai-tts',
   openai: 'gpt-4o-mini-tts',
   elevenlabs: 'eleven_multilingual_v2',
   google: 'Neural2',
@@ -379,7 +326,6 @@ export const ttsDefaultModels: Record<string, string> = {
 };
 
 export const ttsDefaultVoices: Record<string, string> = {
-  groq: 'tara',
   openai: 'alloy',
   elevenlabs: '21m00Tcm4TlvDq8ikWAM',
   google: 'en-US-Neural2-A',
@@ -387,7 +333,6 @@ export const ttsDefaultVoices: Record<string, string> = {
 };
 
 export const ttsProviderFeatures: Record<string, { maxChars: number; supportsSpeed: boolean; supportsLanguage: boolean; supportsInstructions: boolean }> = {
-  groq: { maxChars: 10000, supportsSpeed: false, supportsLanguage: false, supportsInstructions: false },
   openai: { maxChars: 4096, supportsSpeed: true, supportsLanguage: false, supportsInstructions: true },
   elevenlabs: { maxChars: 5000, supportsSpeed: false, supportsLanguage: false, supportsInstructions: false },
   google: { maxChars: 5000, supportsSpeed: true, supportsLanguage: false, supportsInstructions: false },
@@ -424,10 +369,11 @@ export const imageProperties: INodeProperties[] = [
     displayName: 'Model',
     name: 'model',
     type: 'options',
-    default: 'gpt-image-1',
+    default: 'gpt-image-1.5',
     required: true,
     options: [
-      { name: 'GPT Image 1 (Premium)', value: 'gpt-image-1', description: 'Best quality, $0.011-0.167/image' },
+      { name: 'GPT Image 1.5 (Recommended)', value: 'gpt-image-1.5', description: 'Latest model (Dec 2025), 20% cheaper, better text/logo preservation, $0.009-0.134/image' },
+      { name: 'GPT Image 1 (Premium)', value: 'gpt-image-1', description: 'Previous premium model, $0.011-0.167/image' },
       { name: 'GPT Image 1 Mini (~70% cheaper)', value: 'gpt-image-1-mini', description: 'Cost-effective, $0.005-0.052/image' },
     ],
     displayOptions: { show: { provider: ['openai'] } },
@@ -708,7 +654,7 @@ export const imageProperties: INodeProperties[] = [
 ];
 
 export const imageDefaultModels: Record<string, string> = {
-  openai: 'gpt-image-1',
+  openai: 'gpt-image-1.5',
   google: 'gemini-2.5-flash-image',
   stability: 'core',
   leonardo: 'phoenix',
@@ -739,14 +685,60 @@ export const chatProviderOptions: INodePropertyOptions[] = [
 
 export const chatModelOptions: Record<string, INodePropertyOptions[]> = {
   groq: [
+    { name: 'allam-2-7b', value: 'allam-2-7b' },
+    { name: 'compound', value: 'groq/compound' },
+    { name: 'compound-mini', value: 'groq/compound-mini' },
+    { name: 'llama-3.1-8b-instant', value: 'llama-3.1-8b-instant' },
+    { name: 'llama-3.3-70b-versatile', value: 'llama-3.3-70b-versatile' },
+    { name: 'llama-4-maverick-17b-128e-instruct', value: 'meta-llama/llama-4-maverick-17b-128e-instruct' },
+    { name: 'llama-4-scout-17b-16e-instruct', value: 'meta-llama/llama-4-scout-17b-16e-instruct' },
+    { name: 'kimi-k2-instruct', value: 'moonshotai/kimi-k2-instruct' },
+    { name: 'kimi-k2-instruct-0905', value: 'moonshotai/kimi-k2-instruct-0905' },
+    { name: 'gpt-oss-120b', value: 'openai/gpt-oss-120b' },
+    { name: 'gpt-oss-20b', value: 'openai/gpt-oss-20b' },
+    { name: 'qwen3-32b', value: 'qwen/qwen3-32b' },
   ],
   openai: [
+    { name: 'gpt-3.5-turbo', value: 'openai/gpt-3.5-turbo' },
+    { name: 'gpt-4-turbo', value: 'openai/gpt-4-turbo' },
+    { name: 'gpt-4.1', value: 'openai/gpt-4.1' },
+    { name: 'gpt-4.1-mini', value: 'openai/gpt-4.1-mini' },
+    { name: 'gpt-4.1-nano', value: 'openai/gpt-4.1-nano' },
+    { name: 'gpt-4o', value: 'openai/gpt-4o' },
+    { name: 'gpt-4o-mini', value: 'openai/gpt-4o-mini' },
+    { name: 'gpt-4o-mini-search-preview', value: 'openai/gpt-4o-mini-search-preview' },
+    { name: 'gpt-4o-search-preview', value: 'openai/gpt-4o-search-preview' },
+    { name: 'gpt-5', value: 'openai/gpt-5' },
+    { name: 'gpt-5-chat-latest', value: 'openai/gpt-5-chat-latest' },
+    { name: 'gpt-5-mini', value: 'openai/gpt-5-mini' },
+    { name: 'gpt-5-nano', value: 'openai/gpt-5-nano' },
+    { name: 'gpt-5-search-api', value: 'openai/gpt-5-search-api' },
   ],
   anthropic: [
+    { name: 'claude-3-5-haiku-20241022', value: 'anthropic/claude-3-5-haiku-20241022' },
+    { name: 'claude-3-5-sonnet-20241022', value: 'anthropic/claude-3-5-sonnet-20241022' },
+    { name: 'claude-3-7-sonnet', value: 'anthropic/claude-3-7-sonnet' },
+    { name: 'claude-3-haiku-20240307', value: 'anthropic/claude-3-haiku-20240307' },
+    { name: 'claude-3-opus-20240229', value: 'anthropic/claude-3-opus-20240229' },
+    { name: 'claude-haiku-4-5', value: 'anthropic/claude-haiku-4-5' },
+    { name: 'claude-haiku-4-5-20250514', value: 'anthropic/claude-haiku-4-5-20250514' },
+    { name: 'claude-opus-4-1', value: 'anthropic/claude-opus-4-1' },
+    { name: 'claude-opus-4-5', value: 'anthropic/claude-opus-4-5' },
+    { name: 'claude-opus-4-5-20251101', value: 'anthropic/claude-opus-4-5-20251101' },
+    { name: 'claude-sonnet-4', value: 'anthropic/claude-sonnet-4' },
+    { name: 'claude-sonnet-4-5', value: 'anthropic/claude-sonnet-4-5' },
   ],
   gemini: [
   ],
   google: [
+    { name: 'gemini-1.5-flash', value: 'google/gemini-1.5-flash' },
+    { name: 'gemini-1.5-pro', value: 'google/gemini-1.5-pro' },
+    { name: 'gemini-2.0-flash', value: 'google/gemini-2.0-flash' },
+    { name: 'gemini-2.0-flash-lite', value: 'google/gemini-2.0-flash-lite' },
+    { name: 'gemini-2.5-flash', value: 'google/gemini-2.5-flash' },
+    { name: 'gemini-2.5-flash-lite', value: 'google/gemini-2.5-flash-lite' },
+    { name: 'gemini-2.5-pro', value: 'google/gemini-2.5-pro' },
+    { name: 'gemini-3-pro-preview', value: 'google/gemini-3-pro-preview' },
   ],
   openrouter: [
   ],
@@ -766,9 +758,6 @@ export const chatProviderBaseUrls: Record<string, string> = {
 // =============================================================================
 
 export const ttsModelOptions: Record<string, INodePropertyOptions[]> = {
-  groq: [
-    { name: 'PlayAI TTS (Orpheus)', value: 'playai-tts', description: 'Default' },
-  ],
   openai: [
     { name: 'GPT-4o Mini TTS (Latest)', value: 'gpt-4o-mini-tts', description: 'Default' },
     { name: 'TTS-1 (Standard)', value: 'tts-1' },
@@ -792,16 +781,6 @@ export const ttsModelOptions: Record<string, INodePropertyOptions[]> = {
 };
 
 export const ttsVoiceOptions: Record<string, INodePropertyOptions[]> = {
-  groq: [
-    { name: 'Tara (Conversational Female)', value: 'tara', description: 'Default' },
-    { name: 'Leah (Female)', value: 'leah' },
-    { name: 'Jess (Female)', value: 'jess' },
-    { name: 'Mia (Female)', value: 'mia' },
-    { name: 'Zoe (Female)', value: 'zoe' },
-    { name: 'Leo (Male)', value: 'leo' },
-    { name: 'Dan (Male)', value: 'dan' },
-    { name: 'Zac (Male)', value: 'zac' },
-  ],
   openai: [
     { name: 'Alloy (Neutral)', value: 'alloy', description: 'Default' },
     { name: 'Ash (Warm Male)', value: 'ash' },
@@ -851,9 +830,6 @@ export const ttsVoiceOptions: Record<string, INodePropertyOptions[]> = {
 };
 
 export const ttsFormatOptions: Record<string, INodePropertyOptions[]> = {
-  groq: [
-    { name: 'WAV', value: 'wav' },
-  ],
   openai: [
     { name: 'MP3', value: 'mp3' },
     { name: 'Opus', value: 'opus' },
@@ -890,7 +866,8 @@ export const ttsFormatOptions: Record<string, INodePropertyOptions[]> = {
 
 export const imageModelOptions: Record<string, INodePropertyOptions[]> = {
   openai: [
-    { name: 'GPT Image 1 (Premium)', value: 'gpt-image-1', description: 'Default' },
+    { name: 'GPT Image 1.5 (Recommended)', value: 'gpt-image-1.5', description: 'Default' },
+    { name: 'GPT Image 1 (Premium)', value: 'gpt-image-1' },
     { name: 'GPT Image 1 Mini (~70% cheaper)', value: 'gpt-image-1-mini' },
   ],
   google: [
@@ -970,4 +947,4 @@ export const imageStyleOptions: Record<string, INodePropertyOptions[]> = {
 
 // Configuration metadata
 export const configVersion = '1.0';
-export const configUpdatedAt = '2025-12-17T05:08:21Z';
+export const configUpdatedAt = '2025-12-31T07:11:01Z';
