@@ -6,6 +6,8 @@
     "n8n-community-node-package",
     "n8n",
     "demeterics",
+    "blue-fermion",
+    "blue-fermion-labs",
     "llm",
     "llm-observability",
     "ai",
@@ -35,8 +37,9 @@
   "license": "MIT",
   "homepage": "https://demeterics.com",
   "author": {
-    "name": "Demeterics",
-    "email": "support@demeterics.com"
+    "name": "Blue Fermion Labs",
+    "email": "support@demeterics.com",
+    "url": "https://bluefermionlabs.com"
   },
   "repository": {
     "type": "git",

@@ -406,9 +406,11 @@ export class DemetericsSpeech implements INodeType {
         }
 
         // Make request to Demeterics TTS API
+        // Request base64 format to get JSON response with audio_base64 field
+        // (default is binary which n8n's httpRequest helper can't handle properly)
         const response = await this.helpers.httpRequest({
           method: 'POST',
-          url: `${baseUrl}/tts/v1/generate`,
+          url: `${baseUrl}/tts/v1/generate?response_format=base64`,
           headers: {
             'Authorization': authHeader,
             'Content-Type': 'application/json',

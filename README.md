@@ -2,8 +2,11 @@
 
 [![npm version](https://badge.fury.io/js/n8n-nodes-demeterics.svg)](https://www.npmjs.com/package/n8n-nodes-demeterics)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Blue Fermion Labs](https://img.shields.io/badge/Blue%20Fermion-Labs-1DA7A0)](https://bluefermionlabs.com)
 
 An [n8n](https://n8n.io/) community node for the **[Demeterics](https://demeterics.ai) LLM Gateway** - access multiple AI providers through a unified API with built-in observability, analytics, and cost tracking.
+
+> A [Blue Fermion Labs](https://bluefermionlabs.com) product - Enterprise-Grade AI Tools Built by Executives
 
 ## What is Demeterics?
 
@@ -369,4 +372,12 @@ pnpm check
 
 ---
 
-Built by [Demeterics](https://demeterics.ai) - LLM Observability & Cost Tracking
+Built by [Blue Fermion Labs](https://bluefermionlabs.com) | [Demeterics](https://demeterics.ai) - LLM Observability & Cost Tracking
+
+---
+
+### Blue Fermion
+
+[Blue Fermion Labs](https://bluefermionlabs.com) | [Blue Fermion Advisory](https://bluefermion.com) | [Blue Fermion Publishing](https://unscarcity.ai)
+
+Copyright 2025 Blue Fermion, LLC
