@@ -6,16 +6,35 @@ set -euo pipefail
 #   COMPOSE_FILE=/opt/n8n/docker-compose.yml ./restart.sh
 #   REMOTE=origin BRANCH=main ./restart.sh
 #   STASH=1 ./restart.sh          # auto-stash local changes during pull
+#   ./restart.sh --local           # skip git pull, use local changes only
 
 DIR=${DIR:-/opt/n8n/n8n_data}
 COMPOSE_FILE=${COMPOSE_FILE:-/opt/n8n/docker-compose.yml}
+LOCAL_ONLY=0
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --local|-l)
+      LOCAL_ONLY=1
+      shift
+      ;;
+    *)
+      echo "Unknown option: $1"
+      echo "Usage: ./restart.sh [--local]"
+      exit 1
+      ;;
+  esac
+done
 
 # Move to repo root (directory of this script)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-# Update working tree from git if available
-if [ -d .git ]; then
+# Update working tree from git if available (unless --local is set)
+if [ "$LOCAL_ONLY" = "1" ]; then
+  echo "[demeterics] --local flag set, skipping git pull"
+elif [ -d .git ]; then
   echo "[demeterics] Updating repository via git"
   REMOTE=${REMOTE:-origin}
   CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD || echo HEAD)

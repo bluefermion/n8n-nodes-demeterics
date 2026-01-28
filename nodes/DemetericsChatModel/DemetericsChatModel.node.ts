@@ -219,17 +219,36 @@ export class DemetericsChatModel implements INodeType {
 
     // Use ChatAnthropic for Anthropic provider to get native Anthropic API format
     if (provider === 'anthropic') {
-      // Only pass options that are explicitly set (Anthropic doesn't allow both temperature and topP)
-      const chatModel = new ChatAnthropic({
+      // Anthropic API constraints:
+      // 1. Cannot use both temperature and topP together
+      // 2. topP must be between 0 and 1 (LangChain defaults to -1 which is invalid)
+      // 3. temperature must be between 0 and 1
+      const anthropicOptions: Record<string, unknown> = {
         anthropicApiKey: apiKey,
         anthropicApiUrl: `${baseUrl.replace(/\/$/, '')}/${providerBase}`,
         model,
         callbacks: [tracingCallback],
-        // Only include options that are explicitly defined
-        ...(options.maxTokens !== undefined && { maxTokens: options.maxTokens }),
-        ...(options.temperature !== undefined && { temperature: options.temperature }),
-        ...(options.topP !== undefined && options.temperature === undefined && { topP: options.topP }),
-      });
+      };
+
+      // Always set maxTokens (required for Anthropic)
+      anthropicOptions.maxTokens = options.maxTokens ?? 4096;
+
+      // Only pass temperature OR topP, never both (Anthropic constraint)
+      // Priority: temperature > topP (temperature is more commonly used)
+      if (options.temperature !== undefined) {
+        anthropicOptions.temperature = options.temperature;
+        // Explicitly set topP to undefined to prevent LangChain's -1 default
+        anthropicOptions.topP = undefined;
+      } else if (options.topP !== undefined && options.topP >= 0 && options.topP <= 1) {
+        // Only use topP if it's a valid value
+        anthropicOptions.topP = options.topP;
+      } else {
+        // Default: use temperature 0.7, explicitly disable topP
+        anthropicOptions.temperature = 0.7;
+        anthropicOptions.topP = undefined;
+      }
+
+      const chatModel = new ChatAnthropic(anthropicOptions);
 
       return { response: chatModel };
     }
