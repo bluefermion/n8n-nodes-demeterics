@@ -4,14 +4,15 @@ import type {
   INodeType,
   INodeTypeDescription,
   ISupplyDataFunctions,
-  ILoadOptionsFunctions,
   SupplyData,
   INodePropertyOptions,
+  INodeProperties,
 } from 'n8n-workflow';
 import { NodeConnectionTypes } from 'n8n-workflow';
 
 import { getValidatedBaseUrl } from '../utils/security';
 import { N8nLlmTracing } from './N8nLlmTracing';
+import { chatModelOptions } from '../generated/config';
 
 // Provider options for the dropdown.
 const providerOptions: INodePropertyOptions[] = [
@@ -40,50 +41,108 @@ const providerToCredentialKey: Record<string, string> = {
   openrouter: 'providerApiKeyOpenRouter',
 };
 
-// Fallback models when API call fails
-const fallbackModels: Record<string, INodePropertyOptions[]> = {
-  groq: [
-    { name: 'llama-3.3-70b-versatile', value: 'llama-3.3-70b-versatile' },
-    { name: 'llama-3.1-8b-instant', value: 'llama-3.1-8b-instant' },
-    { name: 'groq/compound', value: 'groq/compound' },
-    { name: 'groq/compound-mini', value: 'groq/compound-mini' },
-    { name: 'meta-llama/llama-4-maverick-17b-128e-instruct', value: 'meta-llama/llama-4-maverick-17b-128e-instruct' },
-    { name: 'qwen/qwen3-32b', value: 'qwen/qwen3-32b' },
-  ],
-  openai: [
-    { name: 'gpt-4o', value: 'gpt-4o' },
-    { name: 'gpt-4o-mini', value: 'gpt-4o-mini' },
-    { name: 'gpt-4-turbo', value: 'gpt-4-turbo' },
-    { name: 'gpt-4', value: 'gpt-4' },
-    { name: 'gpt-3.5-turbo', value: 'gpt-3.5-turbo' },
-  ],
-  anthropic: [
-    { name: 'claude-sonnet-4-20250514', value: 'claude-sonnet-4-20250514' },
-    { name: 'claude-3-5-sonnet-20241022', value: 'claude-3-5-sonnet-20241022' },
-    { name: 'claude-3-5-haiku-20241022', value: 'claude-3-5-haiku-20241022' },
-    { name: 'claude-3-opus-20240229', value: 'claude-3-opus-20240229' },
-  ],
-  google: [
-    { name: 'gemini-2.0-flash', value: 'gemini-2.0-flash' },
-    { name: 'gemini-1.5-pro', value: 'gemini-1.5-pro' },
-    { name: 'gemini-1.5-flash', value: 'gemini-1.5-flash' },
-  ],
-  openrouter: [
-    { name: 'openrouter/auto', value: 'openrouter/auto' },
-    { name: 'anthropic/claude-3.5-sonnet', value: 'anthropic/claude-3.5-sonnet' },
-    { name: 'google/gemini-pro-1.5', value: 'google/gemini-pro-1.5' },
-    { name: 'meta-llama/llama-3.1-70b-instruct', value: 'meta-llama/llama-3.1-70b-instruct' },
-  ],
-};
-
-// Default model per provider
+// Default model per provider (use dated versions for stability)
 const defaultModels: Record<string, string> = {
   groq: 'llama-3.3-70b-versatile',
-  openai: 'gpt-4o',
-  anthropic: 'claude-sonnet-4-20250514',
-  google: 'gemini-2.0-flash',
-  openrouter: 'openrouter/auto',
+  openai: 'openai/gpt-4o',
+  anthropic: 'anthropic/claude-sonnet-4-5',
+  google: 'google/gemini-2.0-flash',
+  openrouter: '',
 };
+
+/**
+ * Format a model ID into a user-friendly display name.
+ * E.g., "claude-opus-4-5" -> "Claude Opus 4.5"
+ */
+function formatModelName(name: string): string {
+  // Handle common model naming patterns
+  return name
+    // Replace hyphens with spaces
+    .replace(/-/g, ' ')
+    // Capitalize first letter of each word
+    .replace(/\b\w/g, (c) => c.toUpperCase())
+    // Fix common model name patterns
+    .replace(/(\d) (\d)/g, '$1.$2')  // "4 5" -> "4.5"
+    .replace(/Gpt/g, 'GPT')
+    .replace(/Llama/g, 'LLaMA')
+    .replace(/\bAi\b/g, 'AI')
+    .replace(/\bMini\b/g, 'Mini')
+    .replace(/Gemini/g, 'Gemini')
+    .replace(/Claude/g, 'Claude')
+    .replace(/Opus/g, 'Opus')
+    .replace(/Sonnet/g, 'Sonnet')
+    .replace(/Haiku/g, 'Haiku');
+}
+
+// Generate model properties for each provider (separate dropdown per provider)
+// This fixes the n8n loadOptionsDependsOn sync issue by using displayOptions instead
+function generateModelProperties(): INodeProperties[] {
+  const properties: INodeProperties[] = [];
+
+  for (const [provider, models] of Object.entries(chatModelOptions)) {
+    if (!models || models.length === 0) continue;
+
+    // Deduplicate: prefer short aliases over dated versions when both exist
+    // e.g., keep "claude-opus-4-5" and hide "claude-opus-4-5-20251101"
+    const deduplicatedModels: INodePropertyOptions[] = [];
+
+    // First pass: collect all base names (without dates)
+    const modelMap = new Map<string, INodePropertyOptions[]>();
+    for (const model of models) {
+      // Extract base name by removing date suffix (e.g., "-20251101")
+      const baseName = (model.name as string).replace(/-\d{8}$/, '');
+      if (!modelMap.has(baseName)) {
+        modelMap.set(baseName, []);
+      }
+      modelMap.get(baseName)!.push(model);
+    }
+
+    // Second pass: for each base name, prefer the short version
+    for (const [baseName, variants] of modelMap) {
+      if (variants.length === 1) {
+        // Format name for display
+        const model = { ...variants[0] };
+        model.name = formatModelName(model.name as string);
+        deduplicatedModels.push(model);
+      } else {
+        // Multiple variants - prefer the shorter name (alias)
+        const shortVersion = variants.find(v => (v.name as string) === baseName);
+        if (shortVersion) {
+          const model = { ...shortVersion };
+          model.name = formatModelName(model.name as string);
+          deduplicatedModels.push(model);
+        } else {
+          // No short version, use the first one
+          const model = { ...variants[0] };
+          model.name = formatModelName(model.name as string);
+          deduplicatedModels.push(model);
+        }
+      }
+    }
+
+    // Sort alphabetically for better UX
+    deduplicatedModels.sort((a, b) => (a.name as string).localeCompare(b.name as string));
+
+    properties.push({
+      displayName: 'Model',
+      name: 'model',
+      type: 'options',
+      default: defaultModels[provider] || (deduplicatedModels[0]?.value as string) || '',
+      options: deduplicatedModels,
+      displayOptions: {
+        show: {
+          provider: [provider],
+        },
+      },
+      description: 'The model to use for chat completion',
+    });
+  }
+
+  return properties;
+}
+
+// Pre-generate model properties at module load time
+const modelProperties = generateModelProperties();
 
 export class DemetericsChatModel implements INodeType {
   description: INodeTypeDescription = {
@@ -104,18 +163,16 @@ export class DemetericsChatModel implements INodeType {
     outputNames: ['Model'],
     credentials: [{ name: 'demetericsApi', required: true }],
     properties: [
-      { displayName: 'Provider', name: 'provider', type: 'options', default: 'groq', options: providerOptions },
       {
-        displayName: 'Model',
-        name: 'model',
+        displayName: 'Provider',
+        name: 'provider',
         type: 'options',
-        typeOptions: {
-          loadOptionsMethod: 'getModels',
-          loadOptionsDependsOn: ['provider'],
-        },
-        default: '',
-        description: 'The model to use for chat completion',
+        default: 'groq',
+        options: providerOptions,
+        description: 'Select the AI provider',
       },
+      // Model dropdowns - one per provider with displayOptions for proper sync
+      ...modelProperties,
       {
         displayName: 'Options',
         name: 'options',
@@ -132,62 +189,6 @@ export class DemetericsChatModel implements INodeType {
         ],
       },
     ],
-  };
-
-  methods = {
-    loadOptions: {
-      async getModels(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-        const provider = this.getCurrentNodeParameter('provider') as string;
-        const providerBase = providerBaseMap[provider] ?? provider;
-
-        try {
-          const credentials = await this.getCredentials('demetericsApi');
-          const demetericsKey = (credentials.apiKey as string) || '';
-          const byok = Boolean(credentials.byok);
-          const baseUrl = getValidatedBaseUrl(credentials.baseUrl as string);
-
-          // Build API key (combine with vendor key if BYOK)
-          const vendorKeyField = providerToCredentialKey[provider];
-          const vendorKey = vendorKeyField ? ((credentials as Record<string, unknown>)[vendorKeyField] as string) || '' : '';
-          const apiKey = byok && vendorKey ? `${demetericsKey};${vendorKey}` : demetericsKey;
-
-          const response = await this.helpers.httpRequest({
-            method: 'GET',
-            url: `${baseUrl}/${providerBase}/v1/models`,
-            headers: {
-              'Authorization': `Bearer ${apiKey}`,
-            },
-            timeout: 10000,
-          });
-
-          const models: INodePropertyOptions[] = [];
-          const data = response?.data || response || [];
-
-          for (const model of data) {
-            const modelId = model.id || model.name || model;
-            if (typeof modelId === 'string') {
-              models.push({
-                name: modelId,
-                value: modelId,
-              });
-            }
-          }
-
-          // Sort models alphabetically
-          models.sort((a, b) => (a.name as string).localeCompare(b.name as string));
-
-          // If we got models, return them; otherwise fall back
-          if (models.length > 0) {
-            return models;
-          }
-        } catch {
-          // Fall through to fallback models
-        }
-
-        // Return fallback models for the provider
-        return fallbackModels[provider] || [{ name: defaultModels[provider] || 'default', value: defaultModels[provider] || 'default' }];
-      },
-    },
   };
 
   async supplyData(this: ISupplyDataFunctions): Promise<SupplyData> {
