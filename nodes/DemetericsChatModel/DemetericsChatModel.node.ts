@@ -219,14 +219,16 @@ export class DemetericsChatModel implements INodeType {
 
     // Use ChatAnthropic for Anthropic provider to get native Anthropic API format
     if (provider === 'anthropic') {
+      // Only pass options that are explicitly set (Anthropic doesn't allow both temperature and topP)
       const chatModel = new ChatAnthropic({
         anthropicApiKey: apiKey,
         anthropicApiUrl: `${baseUrl.replace(/\/$/, '')}/${providerBase}`,
         model,
-        temperature: options.temperature ?? 0.7,
-        maxTokens: options.maxTokens ?? 4096,
-        topP: options.topP ?? 1,
         callbacks: [tracingCallback],
+        // Only include options that are explicitly defined
+        ...(options.maxTokens !== undefined && { maxTokens: options.maxTokens }),
+        ...(options.temperature !== undefined && { temperature: options.temperature }),
+        ...(options.topP !== undefined && options.temperature === undefined && { topP: options.topP }),
       });
 
       return { response: chatModel };
