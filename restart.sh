@@ -66,5 +66,9 @@ fi
 
 # Optional: verify files inside container
 # sudo docker exec -it n8n sh -lc 'ls -la /home/node/.n8n/custom/node_modules/n8n-nodes-demeterics/dist/nodes'
-docker compose -f "$COMPOSE_FILE" logs -f --tail 100 n8n
+if command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; then
+  sudo docker compose -f "$COMPOSE_FILE" logs -f --tail 100 n8n
+elif command -v docker-compose >/dev/null 2>&1; then
+  sudo docker-compose -f "$COMPOSE_FILE" logs -f --tail 100 n8n
+fi
 

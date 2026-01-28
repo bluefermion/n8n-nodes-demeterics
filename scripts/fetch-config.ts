@@ -603,13 +603,82 @@ async function main() {
 
   try {
     const response = await fetch(`${apiUrl}${endpoint}`);
-    const config = JSON.parse(response) as ServiceConfigV2;
+
+    let config: ServiceConfigV2;
+    try {
+      config = JSON.parse(response) as ServiceConfigV2;
+    } catch (parseErr) {
+      console.error('ERROR: Failed to parse API response as JSON');
+      console.error(parseErr);
+      process.exit(1);
+    }
+
+    // Validate required fields exist
+    if (!config.version || !config.updated_at) {
+      console.error('ERROR: API response missing required fields (version, updated_at)');
+      process.exit(1);
+    }
+    if (!config.tts?.providers || !config.image?.providers || !config.chat?.providers) {
+      console.error('ERROR: API response missing provider sections (tts, image, or chat)');
+      process.exit(1);
+    }
 
     console.log(`API Version: ${config.version}`);
     console.log(`Updated: ${config.updated_at}`);
-    console.log(`TTS providers: ${config.tts.providers.length}`);
-    console.log(`Image providers: ${config.image.providers.length}`);
-    console.log(`Chat providers: ${config.chat.providers.length}`);
+
+    // Validate all providers have data - fail if any list is empty
+    const errors: string[] = [];
+
+    console.log(`\nTTS providers: ${config.tts.providers.length}`);
+    if (config.tts.providers.length === 0) {
+      errors.push('No TTS providers returned');
+    }
+    for (const provider of config.tts.providers) {
+      const modelParam = provider.parameters?.find(p => p.name === 'model');
+      const modelCount = modelParam?.options?.length || 0;
+      console.log(`  ${provider.id}: ${modelCount} models`);
+      if (modelCount === 0) {
+        errors.push(`TTS provider '${provider.id}' has no models`);
+      }
+    }
+
+    console.log(`\nImage providers: ${config.image.providers.length}`);
+    if (config.image.providers.length === 0) {
+      errors.push('No Image providers returned');
+    }
+    for (const provider of config.image.providers) {
+      const modelParam = provider.parameters?.find(p => p.name === 'model');
+      const modelCount = modelParam?.options?.length || 0;
+      console.log(`  ${provider.id}: ${modelCount} models`);
+      if (modelCount === 0) {
+        errors.push(`Image provider '${provider.id}' has no models`);
+      }
+    }
+
+    console.log(`\nChat providers: ${config.chat.providers.length}`);
+    if (config.chat.providers.length === 0) {
+      errors.push('No Chat providers returned');
+    }
+    // Providers that are allowed to have empty model lists
+    const optionalChatProviders = ['openrouter'];
+    for (const provider of config.chat.providers) {
+      const enabledModels = provider.models?.filter(m => m.enabled && m.category === 'chat') || [];
+      console.log(`  ${provider.id}: ${enabledModels.length} enabled chat models`);
+      if (enabledModels.length === 0 && !optionalChatProviders.includes(provider.id)) {
+        errors.push(`Chat provider '${provider.id}' has no enabled chat models`);
+      }
+    }
+
+    if (errors.length > 0) {
+      console.error('\nERROR: API returned incomplete data:');
+      for (const err of errors) {
+        console.error(`  - ${err}`);
+      }
+      console.error('\nKeeping existing config files. Check the Demeterics API for issues.');
+      process.exit(1);
+    }
+
+    console.log('\nValidation passed.');
 
     // Generate TypeScript from schema
     const typescript = generateTypeScript(config);
