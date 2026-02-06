@@ -1,8 +1,8 @@
 /**
  * Auto-generated configuration from Demeterics API
- * Generated: 2026-01-28T21:25:16.721Z
+ * Generated: 2026-02-05T12:00:00.000Z
  * API Version: 1.0
- * API Updated: 2026-01-28T21:25:16Z
+ * API Updated: 2026-02-05T12:00:00Z
  * 
  * DO NOT EDIT MANUALLY - Run "npm run fetch-config" to regenerate
  * 
@@ -753,47 +753,45 @@ export const chatModelOptions: Record<string, INodePropertyOptions[]> = {
     { name: 'Qwen/qwen3.32b', value: 'groq/qwen/qwen3-32b' },
   ],
   openai: [
-    { name: 'GPT 3.5 Turbo', value: 'openai/gpt-3.5-turbo' },
-    { name: 'GPT 4 Turbo', value: 'openai/gpt-4-turbo' },
+    { name: 'GPT 5.2', value: 'openai/gpt-5.2' },
+    { name: 'GPT 5.1', value: 'openai/gpt-5.1' },
+    { name: 'GPT 5', value: 'openai/gpt-5' },
+    { name: 'GPT 5 Chat Latest', value: 'openai/gpt-5-chat-latest' },
+    { name: 'GPT 5 Codex', value: 'openai/gpt-5-codex' },
+    { name: 'GPT 5 Search Api', value: 'openai/gpt-5-search-api' },
+    { name: 'GPT 5 Mini', value: 'openai/gpt-5-mini' },
+    { name: 'GPT 5 Nano', value: 'openai/gpt-5-nano' },
     { name: 'GPT 4.1', value: 'openai/gpt-4.1' },
     { name: 'GPT 4.1 Mini', value: 'openai/gpt-4.1-mini' },
     { name: 'GPT 4.1 Nano', value: 'openai/gpt-4.1-nano' },
     { name: 'GPT 4o', value: 'openai/gpt-4o' },
     { name: 'GPT 4o Mini', value: 'openai/gpt-4o-mini' },
-    { name: 'GPT 4o Mini Search Preview', value: 'openai/gpt-4o-mini-search-preview' },
     { name: 'GPT 4o Search Preview', value: 'openai/gpt-4o-search-preview' },
-    { name: 'GPT 5', value: 'openai/gpt-5' },
-    { name: 'GPT 5 Chat Latest', value: 'openai/gpt-5-chat-latest' },
-    { name: 'GPT 5 Mini', value: 'openai/gpt-5-mini' },
-    { name: 'GPT 5 Nano', value: 'openai/gpt-5-nano' },
-    { name: 'GPT 5 Search Api', value: 'openai/gpt-5-search-api' },
+    { name: 'GPT 4o Mini Search Preview', value: 'openai/gpt-4o-mini-search-preview' },
+    { name: 'GPT 4 Turbo', value: 'openai/gpt-4-turbo' },
+    { name: 'GPT 3.5 Turbo', value: 'openai/gpt-3.5-turbo' },
   ],
   anthropic: [
-    { name: 'Claude 3.5 Sonnet 20241022', value: 'anthropic/claude-3-5-sonnet-20241022' },
-    { name: 'Claude 3.7 Sonnet', value: 'anthropic/claude-3-7-sonnet' },
-    { name: 'Claude 3 Haiku 20240307', value: 'anthropic/claude-3-haiku-20240307' },
-    { name: 'Claude 3 Opus 20240229', value: 'anthropic/claude-3-opus-20240229' },
-    { name: 'Claude Haiku 3.5', value: 'anthropic/claude-haiku-3-5' },
-    { name: 'Claude Haiku 4.5', value: 'anthropic/claude-haiku-4-5' },
-    { name: 'Claude Haiku 4.5.20250514', value: 'anthropic/claude-haiku-4-5-20250514' },
-    { name: 'Claude Haiku 4.5.20251001', value: 'anthropic/claude-haiku-4-5-20251001' },
-    { name: 'Claude Opus 4', value: 'anthropic/claude-opus-4' },
-    { name: 'Claude Opus 4.1', value: 'anthropic/claude-opus-4-1' },
+    { name: 'Claude Opus 4.6', value: 'anthropic/claude-opus-4-6' },
     { name: 'Claude Opus 4.5', value: 'anthropic/claude-opus-4-5' },
     { name: 'Claude Opus 4.5.20251101', value: 'anthropic/claude-opus-4-5-20251101' },
-    { name: 'Claude Sonnet 3.7', value: 'anthropic/claude-sonnet-3-7' },
-    { name: 'Claude Sonnet 4', value: 'anthropic/claude-sonnet-4' },
+    { name: 'Claude Opus 4.1', value: 'anthropic/claude-opus-4-1' },
+    { name: 'Claude Opus 4', value: 'anthropic/claude-opus-4' },
     { name: 'Claude Sonnet 4.5', value: 'anthropic/claude-sonnet-4-5' },
+    { name: 'Claude Sonnet 4', value: 'anthropic/claude-sonnet-4' },
+    { name: 'Claude Haiku 4.5', value: 'anthropic/claude-haiku-4-5' },
+    { name: 'Claude Haiku 4.5.20251001', value: 'anthropic/claude-haiku-4-5-20251001' },
+    { name: 'Claude Haiku 4.5.20250514', value: 'anthropic/claude-haiku-4-5-20250514' },
+    { name: 'Claude 3 Haiku 20240307', value: 'anthropic/claude-3-haiku-20240307' },
   ],
   google: [
-    { name: 'Gemini 1.5 Flash', value: 'google/gemini-1.5-flash' },
-    { name: 'Gemini 1.5 Pro', value: 'google/gemini-1.5-pro' },
-    { name: 'Gemini 2.0 Flash', value: 'google/gemini-2.0-flash' },
-    { name: 'Gemini 2.0 Flash Lite', value: 'google/gemini-2.0-flash-lite' },
+    { name: 'Gemini 3 Flash Preview', value: 'google/gemini-3-flash-preview' },
+    { name: 'Gemini 3 Pro Preview', value: 'google/gemini-3-pro-preview' },
+    { name: 'Gemini 2.5 Pro', value: 'google/gemini-2.5-pro' },
     { name: 'Gemini 2.5 Flash', value: 'google/gemini-2.5-flash' },
     { name: 'Gemini 2.5 Flash Lite', value: 'google/gemini-2.5-flash-lite' },
-    { name: 'Gemini 2.5 Pro', value: 'google/gemini-2.5-pro' },
-    { name: 'Gemini 3 Pro Preview', value: 'google/gemini-3-pro-preview' },
+    { name: 'Gemini 1.5 Pro', value: 'google/gemini-1.5-pro' },
+    { name: 'Gemini 1.5 Flash', value: 'google/gemini-1.5-flash' },
   ],
   openrouter: [
   ],
@@ -1017,4 +1015,4 @@ export const imageStyleOptions: Record<string, INodePropertyOptions[]> = {
 
 // Configuration metadata
 export const configVersion = '1.0';
-export const configUpdatedAt = '2026-01-28T21:25:16Z';
+export const configUpdatedAt = '2026-02-05T12:00:00Z';

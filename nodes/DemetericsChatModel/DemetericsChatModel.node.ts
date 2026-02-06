@@ -46,7 +46,7 @@ const defaultModels: Record<string, string> = {
   groq: 'llama-3.3-70b-versatile',
   openai: 'openai/gpt-4o',
   anthropic: 'anthropic/claude-sonnet-4-5',
-  google: 'google/gemini-2.0-flash',
+  google: 'google/gemini-2.5-flash',
   openrouter: '',
 };
 
