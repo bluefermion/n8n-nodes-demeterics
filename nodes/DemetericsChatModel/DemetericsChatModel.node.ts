@@ -84,29 +84,30 @@ function generateModelProperties(): INodeProperties[] {
 
     // Deduplicate: prefer short aliases over dated versions when both exist
     // e.g., keep "claude-opus-4-5" and hide "claude-opus-4-5-20251101"
+    // Uses model VALUE (API ID) for dedup since display names use dots not hyphens
     const deduplicatedModels: INodePropertyOptions[] = [];
 
-    // First pass: collect all base names (without dates)
+    // First pass: group by base value (strip date suffix from API model ID)
     const modelMap = new Map<string, INodePropertyOptions[]>();
     for (const model of models) {
-      // Extract base name by removing date suffix (e.g., "-20251101")
-      const baseName = (model.name as string).replace(/-\d{8}$/, '');
-      if (!modelMap.has(baseName)) {
-        modelMap.set(baseName, []);
+      // Extract base value by removing date suffix from API ID (e.g., "-20251101")
+      const baseValue = (model.value as string).replace(/-\d{8}$/, '');
+      if (!modelMap.has(baseValue)) {
+        modelMap.set(baseValue, []);
       }
-      modelMap.get(baseName)!.push(model);
+      modelMap.get(baseValue)!.push(model);
     }
 
-    // Second pass: for each base name, prefer the short version
-    for (const [baseName, variants] of modelMap) {
+    // Second pass: for each base value, prefer the short version (alias without date)
+    for (const [baseValue, variants] of modelMap) {
       if (variants.length === 1) {
         // Format name for display
         const model = { ...variants[0] };
         model.name = formatModelName(model.name as string);
         deduplicatedModels.push(model);
       } else {
-        // Multiple variants - prefer the shorter name (alias)
-        const shortVersion = variants.find(v => (v.name as string) === baseName);
+        // Multiple variants - prefer the one whose value matches the base (no date suffix)
+        const shortVersion = variants.find(v => (v.value as string) === baseValue);
         if (shortVersion) {
           const model = { ...shortVersion };
           model.name = formatModelName(model.name as string);
