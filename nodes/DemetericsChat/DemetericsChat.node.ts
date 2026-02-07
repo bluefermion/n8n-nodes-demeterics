@@ -236,8 +236,8 @@ export class DemetericsChat implements INodeType {
             displayName: 'Timeout (seconds)',
             name: 'timeout',
             type: 'number',
-            typeOptions: { minValue: 1, maxValue: 600 },
-            default: 60,
+            typeOptions: { minValue: 1, maxValue: 1800 },
+            default: 120,
             description: 'Request timeout in seconds',
           },
           {
