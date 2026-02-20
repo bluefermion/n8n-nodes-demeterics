@@ -1,8 +1,8 @@
 /**
  * Auto-generated configuration from Demeterics API
- * Generated: 2026-02-05T12:00:00.000Z
+ * Generated: 2026-02-08T06:09:38.339Z
  * API Version: 1.0
- * API Updated: 2026-02-05T12:00:00Z
+ * API Updated: 2026-02-08T06:09:37Z
  * 
  * DO NOT EDIT MANUALLY - Run "npm run fetch-config" to regenerate
  * 
@@ -557,13 +557,14 @@ export const imageProperties: INodeProperties[] = [
     displayName: 'Model',
     name: 'model',
     type: 'options',
-    default: 'core',
+    default: 'sd3.5-large',
     required: true,
     options: [
       { name: 'Stable Image Ultra (Highest Quality)', value: 'ultra', description: '$0.08/image' },
+      { name: 'SD3.5 Large (Recommended)', value: 'sd3.5-large', description: '$0.065/image - best anatomy and prompt adherence' },
+      { name: 'SD3.5 Large Turbo (Fast)', value: 'sd3.5-large-turbo', description: '$0.04/image - ~4 steps, much faster' },
+      { name: 'SD3.5 Medium', value: 'sd3.5-medium', description: '$0.035/image - consumer-grade' },
       { name: 'Stable Image Core (Balanced)', value: 'core', description: '$0.03/image' },
-      { name: 'SD3 Large', value: 'sd3-large', description: '$0.065/image' },
-      { name: 'SD3 Medium', value: 'sd3-medium', description: '$0.035/image' },
     ],
     displayOptions: { show: { provider: ['stability'] } },
   },
@@ -627,10 +628,12 @@ export const imageProperties: INodeProperties[] = [
     displayName: 'Model',
     name: 'model',
     type: 'options',
-    default: 'phoenix',
+    default: 'lucid-origin',
     required: true,
     options: [
-      { name: 'Phoenix 1.0 (Flagship)', value: 'phoenix', description: 'Latest flagship model, best quality' },
+      { name: 'Lucid Origin (Newest Flagship)', value: 'lucid-origin', description: 'Aesthetic generalist, Full HD, best prompt adherence' },
+      { name: 'Lucid Realism (Photorealistic)', value: 'lucid-realism', description: 'Hyper-photorealistic, cinematic lighting' },
+      { name: 'Phoenix 1.0 (Previous Flagship)', value: 'phoenix', description: 'In-house foundational model, strong text rendering' },
       { name: 'Kino XL (Cinematic)', value: 'kino-xl', description: 'Cinematic and dramatic style' },
       { name: 'Vision XL (Photorealistic)', value: 'vision-xl', description: 'High-fidelity photorealistic images' },
       { name: 'Diffusion XL (Versatile)', value: 'diffusion-xl', description: 'General purpose, versatile output' },
@@ -711,8 +714,8 @@ export const imageProperties: INodeProperties[] = [
 export const imageDefaultModels: Record<string, string> = {
   openai: 'gpt-image-1.5',
   google: 'gemini-2.5-flash-image',
-  stability: 'core',
-  leonardo: 'phoenix',
+  stability: 'sd3.5-large',
+  leonardo: 'lucid-origin',
 };
 
 export const imageProviderFeatures: Record<string, { supportsNegativePrompt: boolean; supportsQuality: boolean; supportsStyle: boolean; maxImages: number; maxPromptLen: number }> = {
@@ -740,6 +743,8 @@ export const chatProviderOptions: INodePropertyOptions[] = [
 export const chatModelOptions: Record<string, INodePropertyOptions[]> = {
   groq: [
     { name: 'ALLaM 2.7b', value: 'groq/allam-2-7b' },
+    { name: 'Compound', value: 'groq/compound' },
+    { name: 'Compound Mini', value: 'groq/compound-mini' },
     { name: 'Groq/compound', value: 'groq/groq/compound' },
     { name: 'Groq/compound Mini', value: 'groq/groq/compound-mini' },
     { name: 'LLaMA 3.1.8b Instant', value: 'groq/llama-3.1-8b-instant' },
@@ -753,45 +758,47 @@ export const chatModelOptions: Record<string, INodePropertyOptions[]> = {
     { name: 'Qwen/qwen3.32b', value: 'groq/qwen/qwen3-32b' },
   ],
   openai: [
-    { name: 'GPT 5.2', value: 'openai/gpt-5.2' },
-    { name: 'GPT 5.1', value: 'openai/gpt-5.1' },
-    { name: 'GPT 5', value: 'openai/gpt-5' },
-    { name: 'GPT 5 Chat Latest', value: 'openai/gpt-5-chat-latest' },
-    { name: 'GPT 5 Codex', value: 'openai/gpt-5-codex' },
-    { name: 'GPT 5 Search Api', value: 'openai/gpt-5-search-api' },
-    { name: 'GPT 5 Mini', value: 'openai/gpt-5-mini' },
-    { name: 'GPT 5 Nano', value: 'openai/gpt-5-nano' },
+    { name: 'GPT 3.5 Turbo', value: 'openai/gpt-3.5-turbo' },
+    { name: 'GPT 4 Turbo', value: 'openai/gpt-4-turbo' },
     { name: 'GPT 4.1', value: 'openai/gpt-4.1' },
     { name: 'GPT 4.1 Mini', value: 'openai/gpt-4.1-mini' },
     { name: 'GPT 4.1 Nano', value: 'openai/gpt-4.1-nano' },
     { name: 'GPT 4o', value: 'openai/gpt-4o' },
     { name: 'GPT 4o Mini', value: 'openai/gpt-4o-mini' },
-    { name: 'GPT 4o Search Preview', value: 'openai/gpt-4o-search-preview' },
     { name: 'GPT 4o Mini Search Preview', value: 'openai/gpt-4o-mini-search-preview' },
-    { name: 'GPT 4 Turbo', value: 'openai/gpt-4-turbo' },
-    { name: 'GPT 3.5 Turbo', value: 'openai/gpt-3.5-turbo' },
+    { name: 'GPT 4o Search Preview', value: 'openai/gpt-4o-search-preview' },
+    { name: 'GPT 5', value: 'openai/gpt-5' },
+    { name: 'GPT 5 Chat Latest', value: 'openai/gpt-5-chat-latest' },
+    { name: 'GPT 5 Mini', value: 'openai/gpt-5-mini' },
+    { name: 'GPT 5 Nano', value: 'openai/gpt-5-nano' },
+    { name: 'GPT 5 Search Api', value: 'openai/gpt-5-search-api' },
+    { name: 'GPT 5.1', value: 'openai/gpt-5.1' },
+    { name: 'GPT 5.2', value: 'openai/gpt-5.2' },
   ],
   anthropic: [
-    { name: 'Claude Opus 4.6', value: 'anthropic/claude-opus-4-6' },
+    { name: 'Claude 3 Haiku 20240307', value: 'anthropic/claude-3-haiku-20240307' },
+    { name: 'Claude Haiku 3.5', value: 'anthropic/claude-haiku-3-5' },
+    { name: 'Claude Haiku 4.5', value: 'anthropic/claude-haiku-4-5' },
+    { name: 'Claude Haiku 4.5.20250514', value: 'anthropic/claude-haiku-4-5-20250514' },
+    { name: 'Claude Haiku 4.5.20251001', value: 'anthropic/claude-haiku-4-5-20251001' },
+    { name: 'Claude Opus 4', value: 'anthropic/claude-opus-4' },
+    { name: 'Claude Opus 4.1', value: 'anthropic/claude-opus-4-1' },
     { name: 'Claude Opus 4.5', value: 'anthropic/claude-opus-4-5' },
     { name: 'Claude Opus 4.5.20251101', value: 'anthropic/claude-opus-4-5-20251101' },
-    { name: 'Claude Opus 4.1', value: 'anthropic/claude-opus-4-1' },
-    { name: 'Claude Opus 4', value: 'anthropic/claude-opus-4' },
-    { name: 'Claude Sonnet 4.5', value: 'anthropic/claude-sonnet-4-5' },
+    { name: 'Claude Opus 4.6', value: 'anthropic/claude-opus-4-6' },
+    { name: 'Claude Sonnet 3.7', value: 'anthropic/claude-sonnet-3-7' },
     { name: 'Claude Sonnet 4', value: 'anthropic/claude-sonnet-4' },
-    { name: 'Claude Haiku 4.5', value: 'anthropic/claude-haiku-4-5' },
-    { name: 'Claude Haiku 4.5.20251001', value: 'anthropic/claude-haiku-4-5-20251001' },
-    { name: 'Claude Haiku 4.5.20250514', value: 'anthropic/claude-haiku-4-5-20250514' },
-    { name: 'Claude 3 Haiku 20240307', value: 'anthropic/claude-3-haiku-20240307' },
+    { name: 'Claude Sonnet 4.5', value: 'anthropic/claude-sonnet-4-5' },
+    { name: 'Claude Sonnet 4.5.20250929', value: 'anthropic/claude-sonnet-4-5-20250929' },
   ],
   google: [
-    { name: 'Gemini 3 Flash Preview', value: 'google/gemini-3-flash-preview' },
-    { name: 'Gemini 3 Pro Preview', value: 'google/gemini-3-pro-preview' },
-    { name: 'Gemini 2.5 Pro', value: 'google/gemini-2.5-pro' },
+    { name: 'Gemini 1.5 Flash', value: 'google/gemini-1.5-flash' },
+    { name: 'Gemini 1.5 Pro', value: 'google/gemini-1.5-pro' },
     { name: 'Gemini 2.5 Flash', value: 'google/gemini-2.5-flash' },
     { name: 'Gemini 2.5 Flash Lite', value: 'google/gemini-2.5-flash-lite' },
-    { name: 'Gemini 1.5 Pro', value: 'google/gemini-1.5-pro' },
-    { name: 'Gemini 1.5 Flash', value: 'google/gemini-1.5-flash' },
+    { name: 'Gemini 2.5 Pro', value: 'google/gemini-2.5-pro' },
+    { name: 'Gemini 3 Flash Preview', value: 'google/gemini-3-flash-preview' },
+    { name: 'Gemini 3 Pro Preview', value: 'google/gemini-3-pro-preview' },
   ],
   openrouter: [
   ],
@@ -946,12 +953,15 @@ export const imageModelOptions: Record<string, INodePropertyOptions[]> = {
   ],
   stability: [
     { name: 'Stable Image Ultra (Highest Quality)', value: 'ultra' },
-    { name: 'Stable Image Core (Balanced)', value: 'core', description: 'Default' },
-    { name: 'SD3 Large', value: 'sd3-large' },
-    { name: 'SD3 Medium', value: 'sd3-medium' },
+    { name: 'SD3.5 Large (Recommended)', value: 'sd3.5-large', description: 'Default' },
+    { name: 'SD3.5 Large Turbo (Fast)', value: 'sd3.5-large-turbo' },
+    { name: 'SD3.5 Medium', value: 'sd3.5-medium' },
+    { name: 'Stable Image Core (Balanced)', value: 'core' },
   ],
   leonardo: [
-    { name: 'Phoenix 1.0 (Flagship)', value: 'phoenix', description: 'Default' },
+    { name: 'Lucid Origin (Newest Flagship)', value: 'lucid-origin', description: 'Default' },
+    { name: 'Lucid Realism (Photorealistic)', value: 'lucid-realism' },
+    { name: 'Phoenix 1.0 (Previous Flagship)', value: 'phoenix' },
     { name: 'Kino XL (Cinematic)', value: 'kino-xl' },
     { name: 'Vision XL (Photorealistic)', value: 'vision-xl' },
     { name: 'Diffusion XL (Versatile)', value: 'diffusion-xl' },
@@ -1015,4 +1025,4 @@ export const imageStyleOptions: Record<string, INodePropertyOptions[]> = {
 
 // Configuration metadata
 export const configVersion = '1.0';
-export const configUpdatedAt = '2026-02-05T12:00:00Z';
+export const configUpdatedAt = '2026-02-08T06:09:37Z';

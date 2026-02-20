@@ -249,7 +249,7 @@ export class DemetericsImage implements INodeType {
     const returnData: INodeExecutionData[] = [];
 
     const credentials = await this.getCredentials('demetericsApi');
-    const byokMode = credentials.byokMode as boolean;
+    const byokMode = credentials.byok as boolean;
     const demetericsApiKey = credentials.apiKey as string;
     const baseUrl = getValidatedBaseUrl(credentials.baseUrl as string);
 
