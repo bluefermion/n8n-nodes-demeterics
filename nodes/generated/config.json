@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-02-08T06:09:37Z",
+  "updated_at": "2026-02-28T04:21:20Z",
   "tts": {
     "providers": [
       {
@@ -1231,17 +1231,6 @@
             "enabled": true
           },
           {
-            "id": "groq/meta-llama/llama-4-maverick-17b-128e-instruct",
-            "display_name": "Meta LLaMA/llama 4 Maverick 17b 128e Instruct",
-            "category": "chat",
-            "context_window": 131072,
-            "max_completion": 8192,
-            "input_per_1k": 0.0002,
-            "output_per_1k": 0.0006,
-            "cached_per_1k": 0.00002,
-            "enabled": true
-          },
-          {
             "id": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
             "display_name": "Meta LLaMA/llama 4 Scout 17b 16e Instruct",
             "category": "chat",
@@ -1251,18 +1240,6 @@
             "output_per_1k": 0.00034,
             "cached_per_1k": 0.000011,
             "enabled": true
-          },
-          {
-            "id": "groq/meta-llama/llama-guard-4-12b",
-            "display_name": "Meta LLaMA/llama Guard 4.12b",
-            "category": "guard",
-            "context_window": 131072,
-            "max_completion": 1024,
-            "input_per_1k": 0.0002,
-            "output_per_1k": 0.0002,
-            "cached_per_1k": 0.00002,
-            "enabled": true,
-            "note": "Content safety model - NOT for chat"
           },
           {
             "id": "groq/meta-llama/llama-prompt-guard-2-22m",
@@ -1575,6 +1552,16 @@
             "note": "GPT-5.1 - intermediate between GPT-5 and GPT-5.2"
           },
           {
+            "id": "openai/gpt-5.1-codex",
+            "display_name": "GPT 5.1 Codex",
+            "category": "code",
+            "input_per_1k": 0.00125,
+            "output_per_1k": 0.01,
+            "cached_per_1k": 0.000125,
+            "enabled": true,
+            "note": "GPT-5.1 Codex - optimized for coding tasks."
+          },
+          {
             "id": "openai/gpt-5.2",
             "display_name": "GPT 5.2",
             "category": "chat",
@@ -1583,6 +1570,16 @@
             "cached_per_1k": 0.000175,
             "enabled": true,
             "note": "GPT-5.2 - most capable model. 90% cached discount."
+          },
+          {
+            "id": "openai/gpt-5.2-codex",
+            "display_name": "GPT 5.2 Codex",
+            "category": "code",
+            "input_per_1k": 0.00175,
+            "output_per_1k": 0.014,
+            "cached_per_1k": 0.000175,
+            "enabled": true,
+            "note": "GPT-5.2 Codex - agentic coding, long-context understanding. Latest codex."
           },
           {
             "id": "openai/gpt-image-1",
@@ -1797,6 +1794,18 @@
             "cached_per_1k": 0.0003,
             "enabled": true,
             "note": "Full model ID for claude-sonnet-4-5"
+          },
+          {
+            "id": "anthropic/claude-sonnet-4-6",
+            "display_name": "Claude Sonnet 4.6",
+            "category": "chat",
+            "context_window": 200000,
+            "max_completion": 128000,
+            "input_per_1k": 0.003,
+            "output_per_1k": 0.015,
+            "cached_per_1k": 0.0003,
+            "enabled": true,
+            "note": "Claude Sonnet 4.6 - Released Feb 2026. Latest Sonnet model."
           }
         ]
       },
@@ -1805,28 +1814,6 @@
         "display_name": "Google",
         "base_url": "https://api.demeterics.com/google/v1",
         "models": [
-          {
-            "id": "google/gemini-1.5-flash",
-            "display_name": "Gemini 1.5 Flash",
-            "category": "chat",
-            "context_window": 1048576,
-            "max_completion": 8192,
-            "input_per_1k": 0.000075,
-            "output_per_1k": 0.0003,
-            "cached_per_1k": 0.0000075,
-            "enabled": true
-          },
-          {
-            "id": "google/gemini-1.5-pro",
-            "display_name": "Gemini 1.5 Pro",
-            "category": "chat",
-            "context_window": 2097152,
-            "max_completion": 8192,
-            "input_per_1k": 0.00125,
-            "output_per_1k": 0.005,
-            "cached_per_1k": 0.000125,
-            "enabled": true
-          },
           {
             "id": "google/gemini-2.5-flash",
             "display_name": "Gemini 2.5 Flash",
@@ -1893,8 +1880,8 @@
             "note": "Gemini 3 Pro Image Preview (Nano Banana Pro) - 4K support"
           },
           {
-            "id": "google/gemini-3-pro-preview",
-            "display_name": "Gemini 3 Pro Preview",
+            "id": "google/gemini-3.1-pro-preview",
+            "display_name": "Gemini 3.1 Pro Preview",
             "category": "chat",
             "context_window": 1048576,
             "max_completion": 65536,
@@ -1902,7 +1889,7 @@
             "output_per_1k": 0.012,
             "cached_per_1k": 0.0002,
             "enabled": true,
-            "note": "Gemini 3 Pro Preview - pricing for ≤200k context"
+            "note": "Gemini 3.1 Pro Preview - Released Feb 19, 2026. 77.1% ARC-AGI-2. Replaces gemini-3-pro-preview."
           },
           {
             "id": "google/imagen-3.0-generate-002",

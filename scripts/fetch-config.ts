@@ -355,7 +355,11 @@ function generateTypeScript(config: ServiceConfigV2): string {
     lines.push(`  ${provider.id}: [`);
     for (const model of chatModels) {
       const displayName = model.display_name || model.id;
-      lines.push(`    { name: '${escapeString(displayName)}', value: '${model.id}' },`);
+      // Strip provider prefix from model ID for user-facing values.
+      // Users select provider separately; model values should be clean names
+      // they recognize (e.g., "openai/gpt-oss-120b" not "groq/openai/gpt-oss-120b").
+      const modelValue = stripProviderPrefix(model.id, provider.id);
+      lines.push(`    { name: '${escapeString(displayName)}', value: '${modelValue}' },`);
     }
     lines.push('  ],');
   }
@@ -591,6 +595,27 @@ function generateNodeProperty(param: ParameterDef, providerId: string, providerF
 
 function escapeString(str: string): string {
   return str.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+}
+
+/**
+ * Strip the provider routing prefix from a model ID.
+ * The API returns fully-qualified IDs like "groq/openai/gpt-oss-120b" for
+ * internal routing, but users should see clean model names they recognize.
+ * Since the provider is already selected in a separate dropdown, the prefix
+ * is redundant and confusing in the model selector.
+ *
+ * Examples:
+ *   stripProviderPrefix("groq/openai/gpt-oss-120b", "groq") → "openai/gpt-oss-120b"
+ *   stripProviderPrefix("groq/llama-3.3-70b-versatile", "groq") → "llama-3.3-70b-versatile"
+ *   stripProviderPrefix("openai/gpt-4-turbo", "openai") → "gpt-4-turbo"
+ *   stripProviderPrefix("anthropic/claude-opus-4-6", "anthropic") → "claude-opus-4-6"
+ */
+function stripProviderPrefix(modelId: string, providerId: string): string {
+  const prefix = providerId + '/';
+  if (modelId.startsWith(prefix)) {
+    return modelId.slice(prefix.length);
+  }
+  return modelId;
 }
 
 // =============================================================================

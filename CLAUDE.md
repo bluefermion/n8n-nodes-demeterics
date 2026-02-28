@@ -16,6 +16,13 @@ These are the operational principles that govern development. Follow them strict
 | **U4** | **Use the shared common library** | `github.com/patdeg/common` provides logging, utilities, and LLM integration |
 | **U5** | **Use Demeterics for LLM observability** | All LLM calls should be tagged with APP, FLOW, ENV, USER for cost tracking |
 
+### n8n Node Objectives
+
+| # | Objective | Rationale |
+|---|-----------|-----------|
+| **N1** | **User-centric model names — never expose internal routing prefixes** | Users select provider separately; model values must be clean names users recognize (e.g., `openai/gpt-oss-120b` not `groq/openai/gpt-oss-120b`, `gpt-4-turbo` not `openai/gpt-4-turbo`). Internal routing IDs like `groq/openai/gpt-oss-120b` are for Datastore indexing, never for UI. The `fetch-config.ts` script strips provider prefixes via `stripProviderPrefix()`. |
+| **N2** | **Model changes require full cross-modality analysis** | When any model changes, do a comprehensive audit across **all modalities** (Chat/LLM, Image, Voice/TTS) and **all providers** (Groq, OpenAI, Anthropic, Google, OpenRouter, ElevenLabs, Stability, Leonardo, Murf). Identify new/updated/deprecated/deleted models. Then update: (1) `pricing.yaml` in `demeterics-private/api/`, (2) `deprecated_models.go` if needed, (3) Datastore pricing entities, (4) run `fetch-config.ts` to regenerate `config.ts`/`config.json`, (5) rebuild n8n nodes with `pnpm build`. Never partially update — always do the full sweep. |
+
 ### Demeterics-Specific Objectives
 
 | # | Objective | Rationale |
@@ -41,6 +48,7 @@ These are the operational principles that govern development. Follow them strict
 │  Use git checkout on user files     │  Preserve uncommitted work│
 │  Run make package without asking    │  Let user run make package│
 │  Delete user work with git reset    │  Confirm destructive ops  │
+│  Expose internal routing IDs in UI  │  Use clean model names    │
 └────────────────────────────────────┴────────────────────────────┘
 ```
 
