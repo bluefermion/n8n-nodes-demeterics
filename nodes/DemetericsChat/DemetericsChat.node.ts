@@ -40,7 +40,7 @@ const providerToCredentialKey: Record<string, string> = {
 const fallbackModels: Record<string, INodePropertyOptions[]> = {
   groq: [
     { name: 'llama-3.3-70b-versatile', value: 'llama-3.3-70b-versatile' },
-    { name: 'llama-3.1-8b-instant', value: 'llama-3.1-8b-instant' },
+    { name: 'openai/gpt-oss-20b', value: 'openai/gpt-oss-20b' },
     { name: 'groq/compound', value: 'groq/compound' },
     { name: 'groq/compound-mini', value: 'groq/compound-mini' },
     { name: 'meta-llama/llama-4-maverick-17b-128e-instruct', value: 'meta-llama/llama-4-maverick-17b-128e-instruct' },
