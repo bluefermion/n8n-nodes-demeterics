@@ -43,7 +43,11 @@ const providerToCredentialKey: Record<string, string> = {
 
 // Default model per provider (use dated versions for stability)
 const defaultModels: Record<string, string> = {
-  groq: 'llama-3.3-70b-versatile',
+  // Groq retired every Llama chat model; llama-3.3-70b-versatile is 404 at Groq
+  // and 403 'disabled' at Demeterics. gpt-oss-120b is what Groq has left, but it
+  // is ALSO 403 'not configured in pricing' at Demeterics and has known-weak
+  // tool-calling — so this default needs a pricing row before it will work.
+  groq: 'openai/gpt-oss-120b',
   openai: 'openai/gpt-4o',
   anthropic: 'anthropic/claude-sonnet-4-5',
   google: 'google/gemini-2.5-flash',
@@ -168,7 +172,10 @@ export class DemetericsChatModel implements INodeType {
         displayName: 'Provider',
         name: 'provider',
         type: 'options',
-        default: 'groq',
+        // Was 'groq'. Groq has no working default left here, and Groq calls are
+        // egress outside the fleet's "no data beyond Anthropic" boundary.
+        // Only affects newly added nodes; existing workflows keep their own value.
+        default: 'anthropic',
         options: providerOptions,
         description: 'Select the AI provider',
       },

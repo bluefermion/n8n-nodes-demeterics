@@ -606,7 +606,7 @@ function escapeString(str: string): string {
  *
  * Examples:
  *   stripProviderPrefix("groq/openai/gpt-oss-120b", "groq") → "openai/gpt-oss-120b"
- *   stripProviderPrefix("groq/llama-3.3-70b-versatile", "groq") → "llama-3.3-70b-versatile"
+ *   stripProviderPrefix("groq/openai/gpt-oss-120b", "groq") → "openai/gpt-oss-120b"
  *   stripProviderPrefix("openai/gpt-4-turbo", "openai") → "gpt-4-turbo"
  *   stripProviderPrefix("anthropic/claude-opus-4-6", "anthropic") → "claude-opus-4-6"
  */
