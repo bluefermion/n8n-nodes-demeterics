@@ -1,8 +1,8 @@
 /**
  * Auto-generated configuration from Demeterics API
- * Generated: 2026-02-28T04:39:22.233Z
+ * Generated: 2026-08-20T22:54:02.850Z
  * API Version: 1.0
- * API Updated: 2026-02-28T04:39:22Z
+ * API Updated: 2026-08-20T22:54:02Z
  * 
  * DO NOT EDIT MANUALLY - Run "npm run fetch-config" to regenerate
  * 
@@ -390,7 +390,7 @@ export const ttsProviderFeatures: Record<string, { maxChars: number; supportsSpe
   groq: { maxChars: 200, supportsSpeed: false, supportsLanguage: false, supportsInstructions: false },
   openai: { maxChars: 4096, supportsSpeed: true, supportsLanguage: false, supportsInstructions: true },
   elevenlabs: { maxChars: 5000, supportsSpeed: false, supportsLanguage: false, supportsInstructions: false },
-  google: { maxChars: 5000, supportsSpeed: true, supportsLanguage: false, supportsInstructions: false },
+  google: { maxChars: 8000, supportsSpeed: true, supportsLanguage: false, supportsInstructions: false },
   murf: { maxChars: 10000, supportsSpeed: true, supportsLanguage: true, supportsInstructions: false },
 };
 
@@ -740,18 +740,11 @@ export const chatProviderOptions: INodePropertyOptions[] = [
 export const chatModelOptions: Record<string, INodePropertyOptions[]> = {
   groq: [
     { name: 'ALLaM 2.7b', value: 'allam-2-7b' },
-    { name: 'Compound', value: 'compound' },
-    { name: 'Compound Mini', value: 'compound-mini' },
     { name: 'Groq/compound', value: 'groq/compound' },
     { name: 'Groq/compound Mini', value: 'groq/compound-mini' },
-    { name: 'LLaMA 3.1.8b Instant', value: 'llama-3.1-8b-instant' },
-    { name: 'LLaMA 3.3.70b Versatile', value: 'llama-3.3-70b-versatile' },
-    { name: 'Meta LLaMA/llama 4 Scout 17b 16e Instruct', value: 'meta-llama/llama-4-scout-17b-16e-instruct' },
-    { name: 'Moonshotai/kimi K2 Instruct', value: 'moonshotai/kimi-k2-instruct' },
-    { name: 'Moonshotai/kimi K2 Instruct 0905', value: 'moonshotai/kimi-k2-instruct-0905' },
     { name: 'Openai/gpt OSS 120b', value: 'openai/gpt-oss-120b' },
     { name: 'Openai/gpt OSS 20b', value: 'openai/gpt-oss-20b' },
-    { name: 'Qwen/qwen3.32b', value: 'qwen/qwen3-32b' },
+    { name: 'Qwen/qwen3.6.27b', value: 'qwen/qwen3.6-27b' },
   ],
   openai: [
     { name: 'GPT 3.5 Turbo', value: 'gpt-3.5-turbo' },
@@ -770,30 +763,35 @@ export const chatModelOptions: Record<string, INodePropertyOptions[]> = {
     { name: 'GPT 5 Search Api', value: 'gpt-5-search-api' },
     { name: 'GPT 5.1', value: 'gpt-5.1' },
     { name: 'GPT 5.2', value: 'gpt-5.2' },
+    { name: 'GPT 5.4', value: 'gpt-5.4' },
+    { name: 'GPT 5.4 Mini', value: 'gpt-5.4-mini' },
+    { name: 'GPT 5.4 Nano', value: 'gpt-5.4-nano' },
+    { name: 'GPT 5.5', value: 'gpt-5.5' },
+    { name: 'GPT 5.6 Luna', value: 'gpt-5.6-luna' },
+    { name: 'GPT 5.6 Sol', value: 'gpt-5.6-sol' },
+    { name: 'GPT 5.6 Terra', value: 'gpt-5.6-terra' },
   ],
   anthropic: [
-    { name: 'Claude 3 Haiku 20240307', value: 'claude-3-haiku-20240307' },
-    { name: 'Claude Haiku 3.5', value: 'claude-haiku-3-5' },
     { name: 'Claude Haiku 4.5', value: 'claude-haiku-4-5' },
-    { name: 'Claude Haiku 4.5.20250514', value: 'claude-haiku-4-5-20250514' },
     { name: 'Claude Haiku 4.5.20251001', value: 'claude-haiku-4-5-20251001' },
-    { name: 'Claude Opus 4', value: 'claude-opus-4' },
-    { name: 'Claude Opus 4.1', value: 'claude-opus-4-1' },
-    { name: 'Claude Opus 4.5', value: 'claude-opus-4-5' },
-    { name: 'Claude Opus 4.5.20251101', value: 'claude-opus-4-5-20251101' },
-    { name: 'Claude Opus 4.6', value: 'claude-opus-4-6' },
-    { name: 'Claude Sonnet 3.7', value: 'claude-sonnet-3-7' },
-    { name: 'Claude Sonnet 4', value: 'claude-sonnet-4' },
+    { name: 'Claude Opus 4.8', value: 'claude-opus-4-8' },
+    { name: 'Claude Opus 5', value: 'claude-opus-5' },
     { name: 'Claude Sonnet 4.5', value: 'claude-sonnet-4-5' },
     { name: 'Claude Sonnet 4.5.20250929', value: 'claude-sonnet-4-5-20250929' },
     { name: 'Claude Sonnet 4.6', value: 'claude-sonnet-4-6' },
+    { name: 'Claude Sonnet 5', value: 'claude-sonnet-5' },
   ],
   google: [
     { name: 'Gemini 2.5 Flash', value: 'gemini-2.5-flash' },
     { name: 'Gemini 2.5 Flash Lite', value: 'gemini-2.5-flash-lite' },
     { name: 'Gemini 2.5 Pro', value: 'gemini-2.5-pro' },
     { name: 'Gemini 3 Flash Preview', value: 'gemini-3-flash-preview' },
+    { name: 'Gemini 3.1 Flash Lite', value: 'gemini-3.1-flash-lite' },
     { name: 'Gemini 3.1 Pro Preview', value: 'gemini-3.1-pro-preview' },
+    { name: 'Gemini 3.5 Flash', value: 'gemini-3.5-flash' },
+    { name: 'Gemini 3.5 Flash Lite', value: 'gemini-3.5-flash-lite' },
+    { name: 'Gemini 3.6 Flash', value: 'gemini-3.6-flash' },
+    { name: 'Gemini 3.7 Flash', value: 'gemini-3.7-flash' },
   ],
   openrouter: [
   ],
@@ -1017,4 +1015,4 @@ export const imageStyleOptions: Record<string, INodePropertyOptions[]> = {
 
 // Configuration metadata
 export const configVersion = '1.0';
-export const configUpdatedAt = '2026-02-28T04:39:22Z';
+export const configUpdatedAt = '2026-08-20T22:54:02Z';
