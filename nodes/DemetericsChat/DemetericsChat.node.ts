@@ -39,11 +39,11 @@ const providerToCredentialKey: Record<string, string> = {
 // Fallback models when API call fails
 const fallbackModels: Record<string, INodePropertyOptions[]> = {
   groq: [
-    { name: 'llama-3.3-70b-versatile', value: 'llama-3.3-70b-versatile' },
+    { name: 'anthropic/claude-haiku-4-5', value: 'anthropic/claude-haiku-4-5' },
     { name: 'openai/gpt-oss-20b', value: 'openai/gpt-oss-20b' },
     { name: 'groq/compound', value: 'groq/compound' },
     { name: 'groq/compound-mini', value: 'groq/compound-mini' },
-    { name: 'meta-llama/llama-4-maverick-17b-128e-instruct', value: 'meta-llama/llama-4-maverick-17b-128e-instruct' },
+    { name: 'anthropic/claude-haiku-4-5', value: 'anthropic/claude-haiku-4-5' },
     { name: 'qwen/qwen3-32b', value: 'qwen/qwen3-32b' },
   ],
   openai: [
@@ -76,9 +76,13 @@ const fallbackModels: Record<string, INodePropertyOptions[]> = {
 
 // Default model per provider
 const defaultModels: Record<string, string> = {
-  groq: 'llama-3.3-70b-versatile',
+  groq: 'anthropic/claude-haiku-4-5',
   openai: 'gpt-4o',
-  anthropic: 'claude-sonnet-4-20250514',
+  // Was claude-sonnet-4-20250514, retired and refused with 403 "Model ... is
+  // disabled" (observed 2026-08-20). Use the undated alias so Demeterics'
+  // synonym table keeps it pointed at whatever Sonnet is current, rather than
+  // pinning a snapshot that becomes an outage the day the vendor retires it.
+  anthropic: 'claude-sonnet-4-5',
   google: 'gemini-2.5-flash',
   openrouter: 'openrouter/auto',
 };
